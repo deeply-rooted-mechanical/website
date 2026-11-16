@@ -125,11 +125,10 @@ REVIEWS = {
 PROJECTS = [
     ("library-crane.jpg", "building", "Springfield Township Library", "90-ton rooftop unit and heating and ventilating replacement, contracted direct with the township. Our largest project to date.", ["Rooftop units", "Owner direct", "Completed 2026"]),
     ("arbon-buildout.jpg", "duct", "Arbon Equipment", "9,000 SF office build-out. Design-build HVAC and ductwork with Schafer Construction.", ["Design-build", "Completed 2024"]),
-    ("retail-rtu.jpg", "building", "Frames &amp; More", "Rooftop unit replacement: crane lift, setting and startup on an occupied retail building.", ["Rooftop units", "Retail"]),
+    ("agape-duct.jpg", "duct", "Agape Church", "20,000 SF new church building. Design-build HVAC and spiral ductwork with Schafer Construction.", ["Design-build", "New construction", "In progress"]),
 ]
 
 MORE_WORK = [
-    ("Agape Church", "20,000 SF new building, design-build", "In progress"),
     ("Puckmasters Ice Rink", "11,000 SF new building, design-build", "In progress"),
     ("Levin Courthouse", "HVAC in an occupied federal building", "2026"),
     ("Straits Corporation", "Rooftop unit replacements, owner direct", "2026"),
@@ -417,11 +416,16 @@ def steps(items):
                                           for i, (t, d) in enumerate(items, 1)) + '</ol>'
 
 
-TRUSTED = ["Springfield Township", "Levin Courthouse", "Target", "Schafer Construction", "Woods Construction", "McKenzie Construction", "Straits Corporation", "Arbon Equipment"]
+# Client logos (Matt 11/16: "All logos now"). Levin Courthouse is text only: federal seals/logos can't be used to imply endorsement.
+TRUSTED = [("target", "Target"), ("marriott", "Troy Marriott"), ("dac", "Detroit Athletic Club"), (None, "Levin U.S. Courthouse"),
+           ("springfield", "Springfield Township"), ("schafer", "Schafer Construction"), ("woods", "Woods Construction"),
+           ("mckenzie", "McKenzie Construction")]
 
 
 def trusted_by():
-    items = "".join(f"<li>{e(t)}</li>" for t in TRUSTED)
+    items = "".join(
+        (f'<li><img src="/assets/clients/{k}.png" alt="{e(n)} logo" height="56" loading="lazy"><span>{e(n)}</span></li>' if k else
+         f'<li class="txt"><span class="tb-ic">{icon("shield", 30)}</span><span>{e(n)}</span></li>') for k, n in TRUSTED)
     return f'<section class="trusted"><div class="wrap"><p class="tb-h">Trusted by owners and general contractors including</p><ul>{items}</ul></div></section>'
 
 
@@ -441,7 +445,6 @@ def faq_html(faqs):
 # ---------------- pages ----------------
 HOME = f"""<section class="hero" style="--hero:url('/assets/img/rtu-crane.jpg')"><div class="wrap">
 <div class="hero-copy">
-<img class="hero-logo" src="/assets/logo-sm.png" alt="{NAME} logo" width="132" height="132">
 <p class="hero-slogan">{SLOGAN_HTML}</p>
 <h1>Commercial HVAC you can count on, across Southeast Michigan.</h1>
 <p>Rooftop unit repair and replacement, maintenance agreements, design-build and tenant build-outs, and 24/7 emergency service for building owners, property managers and general contractors. Homeowners too.</p>
