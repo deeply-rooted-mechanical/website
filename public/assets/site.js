@@ -34,6 +34,8 @@ document.documentElement.classList.add("js");
     if (title && titles[tv]) title.textContent = titles[tv];
     var al = document.getElementById("addrLabel"), st = document.getElementById("submitText");
     if (al) al.textContent = (tv === "Quote" || tv === "Free Equipment Assessment") ? "Project or building address" : "Service address";
+    var em = f.querySelector('input[name="email"]'), emo = em && em.parentNode.querySelector(".opt");
+    if (em) { var need = tv === "Quote" || tv === "Free Equipment Assessment"; em.required = need; if (emo) emo.textContent = need ? "(so we can send your quote or report)" : "(optional)"; }
     if (st) st.textContent = tv === "Quote" ? "Send project details" : tv === "Free Equipment Assessment" ? "Book my assessment" : "Send request";
     if (copy[tv]) { if (sub) sub.textContent = copy[tv][0]; if (dl) dl.textContent = copy[tv][1]; if (desc) desc.placeholder = copy[tv][2]; }
   }

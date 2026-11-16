@@ -5,7 +5,7 @@ Edit content below, run `python3 build.py`, commit build.py + public/.
 Netlify publishes public/ as-is on every push to main (no build step on Netlify).
 This repo is PUBLIC: never put keys, passwords or business notes in it.
 """
-import json, os, shutil, html, hashlib
+import json, os, re, shutil, html, hashlib
 from PIL import Image
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -255,13 +255,12 @@ def footer():
 </div></section>
 <footer class="site"><div class="wrap cols">
 <div>
-<img src="/assets/logo-sm.png" alt="" width="72" height="72">
 <p><strong>{NAME}</strong><br>{STREET}<br>{CITY}, {STATE} {ZIP}</p>
 <p class="small">Michigan Mechanical Contractor License #{LICENSE}<br>Licensed and insured. Established 2024.</p>
 </div>
 <div>
 <h3>Contact</h3>
-<ul class="flinks"><li><a href="tel:{TEL}">{PHONE}</a> (press 1 for service)</li><li><a href="mailto:{EMAIL}">{EMAIL}</a></li></ul>
+<ul class="flinks"><li><a class="nw" href="tel:{TEL}">{PHONE}</a> (press 1 for service)</li><li><a href="mailto:{EMAIL}">{EMAIL}</a></li></ul>
 <p>Office: Mon to Fri, 7:00 AM to 4:30 PM<br>Emergency service 24/7</p>
 </div>
 <div>
@@ -284,7 +283,11 @@ def footer():
 
 
 def page(path, title, desc, body, extra=()):
-    return head(title, desc, path, list(extra)) + header(path) + body + footer()
+    h = head(title, desc, path, list(extra))
+    m = re.search(r"--hero:url\('([^']+)'\)", body)
+    if m:
+        h = h.replace('<link rel="stylesheet"', f'<link rel="preload" as="image" href="{m.group(1)}">\n<link rel="stylesheet"', 1)
+    return h + header(path) + body + footer()
 
 
 def img(name, alt, cls="", lazy=True):
@@ -302,6 +305,9 @@ def buttons(dark=True, kind="all"):
     if kind == "gc":     # general contractors: quote first
         return (f'<div class="cta-row"><a class="btn {pri}" href="/contact?type=quote">{icon("clipboard", 20)} Send us your project</a>'
                 f'<a class="btn btn-outline{" on-dark" if dark else ""}" href="/projects">{icon("building", 20)} Featured projects</a></div>')
+    if kind == "plans":  # on the plans page itself: call instead of linking back to the same page
+        return (f'<div class="cta-row"><a class="btn {pri}" href="/contact?type=maintenance">{icon("calendar", 20)} Schedule a tune-up</a>'
+                f'<a class="btn btn-outline{" on-dark" if dark else ""}" href="tel:{TEL}">{icon("phone", 20)} Call {PHONE}</a></div>')
     if kind == "home":   # residential pages: no commercial assessment
         out.append(f'<a class="btn {sec}" href="/contact?type=quote">{icon("clipboard", 20)} Request a Quote</a>')
         out.append(f'<a class="btn btn-outline{" on-dark" if dark else ""}" href="/rooted-assurance-program">{icon("calendar", 20)} Maintenance Plans</a>')
@@ -316,7 +322,7 @@ def cta_band(text="Let us serve you!", kind="all"):
     return f"""<section class="cta-band"><div class="wrap">
 <h2>{text}</h2>
 {buttons(dark=True, kind=kind)}
-<p class="cta-phone">Or call <a href="tel:{TEL}">{PHONE}</a> and press 1 for service, 24/7.</p>
+<p class="cta-phone">Or call <a class="nw" href="tel:{TEL}">{PHONE}</a> and press 1 for service, 24/7.</p>
 </div></section>
 """
 
@@ -395,7 +401,7 @@ def project_cards(items):
         top = img(im, f"{html.unescape(t)} project by {NAME}") if im else f'<div class="proj-ph">{icon(ic, 40)}</div>'
         tg = "".join(f"<span>{e(x)}</span>" for x in tags)
         out.append(f'<li>{top}<div><h3>{t}</h3><p>{e(d)}</p><p class="tags">{tg}</p></div></li>')
-    return '<ul class="projects">' + "".join(out) + '</ul>'
+    return f'<ul class="projects n{len(out)}">' + "".join(out) + '</ul>'
 
 
 def projects_section(n=None, head_txt="Featured projects", link=True, skip_first=False):
@@ -404,7 +410,7 @@ def projects_section(n=None, head_txt="Featured projects", link=True, skip_first
         items = items[1:]
     more = '<div class="center"><a class="btn btn-outline" href="/projects">See the project video and more</a></div>' if link else ""
     return f"""<section class="proj-sec"><div class="wrap">
-<div class="section-head center"><h2>{head_txt}</h2><p>A few of the commercial jobs our crews have completed across Southeast Michigan.</p></div>
+<div class="section-head center"><h2>{head_txt}</h2><p>A few of the completed and current commercial jobs our crews have built across Southeast Michigan.</p></div>
 {project_cards(items)}
 {more}
 </div></section>
@@ -421,9 +427,14 @@ TRUSTED = [("target", "Target"), ("marriott", "Troy Marriott"), ("dac", "Detroit
            ("mckenzie", "McKenzie Construction")]
 
 
+def logo_w(k):
+    w, h = Image.open(os.path.join(ROOT, "assets", "clients", k + ".png")).size
+    return round(w * 62 / h)
+
+
 def trusted_by():
     items = "".join(
-        (f'<li><img src="/assets/clients/{k}.png" alt="{e(n)} logo" height="56" loading="lazy"><span>{e(n)}</span></li>' if k else
+        (f'<li><img src="/assets/clients/{k}.png" alt="{e(n)} logo" width="{logo_w(k)}" height="62" loading="lazy"><span>{e(n)}</span></li>' if k else
          f'<li class="txt"><span class="tb-ic">{icon("shield", 30)}</span><span>{e(n)}</span></li>') for k, n in TRUSTED)
     return f'<section class="trusted"><div class="wrap"><p class="tb-h">Trusted by owners and general contractors including</p><ul>{items}</ul></div></section>'
 
@@ -600,7 +611,6 @@ RTU = f"""<section class="page-hero" style="--hero:url('/assets/img/library-cran
 
 PM_FAQ = [
     ("How often do you visit?", "Twice a year (spring and fall) or four times a year (quarterly). Quarterly plans suit buildings that run hard or need tighter filter changes."),
-    ("What does a maintenance agreement cost?", "It is priced by the equipment you have and how often we visit. Start with a Free Equipment Assessment and you will get a written condition report and a maintenance proposal together."),
     ("Do you cover more than one building?", "Yes. One agreement can cover all of your sites, with a written report for every building after each visit."),
     ("Do you service boilers?", "Yes. CSD-1 boiler inspection is included for maintenance customers with boilers."),
 ]
@@ -653,6 +663,7 @@ DESIGN_BUILD = f"""<section class="page-hero" style="--hero:url('/assets/img/bui
 <div class="cta-row"><a class="btn btn-white" href="/contact?type=quote">{icon("clipboard", 20)} Send us your project</a><a class="btn btn-outline on-dark" href="/projects">{icon("building", 20)} Featured projects</a></div>
 </div></section>
 {trust_strip()}
+{trusted_by()}
 
 <section class="services"><div class="wrap">
 <div class="section-head center"><h2>Why general contractors bring us back</h2></div>
@@ -696,7 +707,7 @@ PROJECTS_PAGE = f"""<section class="page-hero" style="--hero:url('/assets/img/li
 </div></section>
 {projects_section(None, "More project highlights", link=False, skip_first=True)}
 <section class="services"><div class="wrap narrow">
-<div class="section-head center"><h2>More recent work</h2><p>A sample of the commercial projects our crews have completed or have underway.</p></div>
+<div class="section-head center"><h2>More recent work</h2><p>A sample of the commercial projects our crews have completed or have in progress.</p></div>
 <table class="work"><thead><tr><th>Project</th><th>Scope</th><th>Year</th></tr></thead><tbody>
 {"".join(f"<tr><td><b>{e(a)}</b></td><td>{e(b)}</td><td>{e(c)}</td></tr>" for a, b, c in MORE_WORK)}
 </tbody></table>
@@ -757,7 +768,7 @@ PLANS_PAGE = f"""<section class="page-hero dim" style="--hero:url('/assets/img/f
 </div></section>
 
 <section class="plans"><div class="wrap">
-<div class="section-head center"><h2>Choose your plan</h2><p>Billed yearly through our secure QuickBooks checkout. Questions? Call <a href="tel:{TEL}">{PHONE}</a>.</p></div>
+<div class="section-head center"><h2>Choose your plan</h2><p>Billed yearly through our secure QuickBooks checkout. Questions? Call <a class="nw" href="tel:{TEL}">{PHONE}</a>.</p></div>
 <div class="plan-grid">{plan_cards()}</div>
 </div></section>
 
@@ -772,7 +783,7 @@ PLANS_PAGE = f"""<section class="page-hero dim" style="--hero:url('/assets/img/f
 <p class="note center">Have a business? See our <a href="/commercial-maintenance">commercial maintenance agreements</a>.</p>
 </div></section>
 {reviews_block(["laura", "anthony", "kathy"], "What homeowners say")}
-{cta_band("Questions about a plan?", kind="home")}
+{cta_band("Questions about a plan?", kind="plans")}
 """
 
 OWNER_STORY = f"""<section class="owner"><div class="wrap owner-inner">
@@ -836,7 +847,7 @@ ABOUT = f"""<section class="page-hero" style="--hero:url('/assets/img/safety-ves
 
 CONTACT = f"""<section class="page-hero short" style="--hero:url('/assets/img/service-tech.jpg')"><div class="wrap">
 <h1 id="formTitle">How can we help?</h1>
-<p id="formSub">Tell us what is going on and we will get back to you quickly. For no heat, no cooling or anything urgent, call <a href="tel:{TEL}">{PHONE}</a> and press 1, any hour.</p>
+<p id="formSub">Tell us what is going on and we will get back to you quickly. For no heat, no cooling or anything urgent, call <a class="nw" href="tel:{TEL}">{PHONE}</a> and press 1, any hour.</p>
 </div></section>
 
 <section class="contact"><div class="wrap contact-inner">
@@ -895,7 +906,7 @@ CONTACT = f"""<section class="page-hero short" style="--hero:url('/assets/img/se
 <aside class="contact-card">
 <h2>Reach us</h2>
 <ul class="reach">
-<li><span class="r-ic">{icon("phone", 22)}</span><span><b>Call</b><a href="tel:{TEL}">{PHONE}</a><small>Press 1 for service, 24/7</small></span></li>
+<li><span class="r-ic">{icon("phone", 22)}</span><span><b>Call</b><a class="nw" href="tel:{TEL}">{PHONE}</a><small>Press 1 for service, 24/7</small></span></li>
 <li><span class="r-ic">{icon("clipboard", 22)}</span><span><b>Email</b><a href="mailto:{EMAIL}">{EMAIL}</a></span></li>
 <li><span class="r-ic">{icon("building", 22)}</span><span><b>Office</b>{STREET}<br>{CITY}, {STATE} {ZIP}</span></li>
 <li><span class="r-ic">{icon("clock", 22)}</span><span><b>Hours</b>Mon to Fri, 7:00 AM to 4:30 PM<small>Emergency service 24/7</small></span></li>
@@ -908,7 +919,7 @@ CONTACT = f"""<section class="page-hero short" style="--hero:url('/assets/img/se
 
 THANKS = f"""<section class="page-hero short"><div class="wrap">
 <h1>Thank you! We got your request.</h1>
-<p>Our team will reach out shortly during business hours. If this is an emergency, please call <a href="tel:{TEL}">{PHONE}</a> and press 1 so we can help right away.</p>
+<p>Our team will reach out shortly during business hours. If this is an emergency, please call <a class="nw" href="tel:{TEL}">{PHONE}</a> and press 1 so we can help right away.</p>
 <div class="cta-row"><a class="btn btn-white" href="/">Back to home</a></div>
 </div></section>
 """
@@ -960,7 +971,7 @@ TERMS = f"""<section class="page-hero short"><div class="wrap"><h1>Terms of Serv
 
 NOTFOUND = f"""<section class="page-hero short"><div class="wrap">
 <h1>We couldn't find that page.</h1>
-<p>Try the <a href="/">home page</a>, or call <a href="tel:{TEL}">{PHONE}</a> and press 1 for service.</p>
+<p>Try the <a href="/">home page</a>, or call <a class="nw" href="tel:{TEL}">{PHONE}</a> and press 1 for service.</p>
 </div></section>
 """
 
