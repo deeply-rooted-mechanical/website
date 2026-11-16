@@ -341,3 +341,24 @@ footer .legal a{display:inline-block;padding:8px 0}
 .page-hero.dim::before{background:linear-gradient(90deg,rgba(17,19,23,.94) 0%,rgba(20,38,61,.9) 60%,rgba(20,38,61,.75) 100%)}
 section.photo-row .section-head{margin-bottom:20px}
 @media (max-width:1020px){.hero .wrap,.page-hero .wrap{padding-bottom:72px}}
+
+/* round 4: bigger logo/name, clean slogan, fewer button colors, values on navy, contact card icons */
+.brand img{width:78px;height:78px}
+.brand-name b{font-size:1.38rem;letter-spacing:.03em}
+.hero-logo{width:132px;height:132px;background:#fff;border-radius:50%;padding:10px;box-shadow:0 8px 26px rgba(0,0,0,.35);margin-bottom:22px}
+.hero-slogan span,.slogan-big span{white-space:nowrap}
+.hero-slogan span{margin-right:.5em}
+.slogan-big span{margin:0 .25em}
+.values,.values.tight{background:var(--navy-d)}
+.values .section-head h2{color:#fff}
+.values .section-head p{color:#d5dae1}
+.value-list li{border-top:4px solid var(--navy-l)}
+.v-ic{background:linear-gradient(135deg,var(--navy),var(--navy-l))}
+.contact-card h2{margin-bottom:14px}
+.reach{list-style:none;padding:0;margin:0 0 16px}
+.reach li{display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--line)}
+.reach b{display:block;color:var(--navy-d)}
+.reach small{display:block;color:var(--muted)}
+.r-ic{width:44px;height:44px;border-radius:12px;background:var(--navy);color:#fff;display:grid;place-items:center;flex:none}
+@media (max-width:1020px){.brand img{width:56px;height:56px}.brand-name b{font-size:1.08rem}}
+@media (max-width:640px){.hero-logo{width:96px;height:96px;padding:7px}.brand-name b{font-size:1rem}.brand img{width:50px;height:50px}}

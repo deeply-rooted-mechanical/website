@@ -28,6 +28,7 @@ GOOGLE_REVIEW = "https://g.page/r/CSk16NMP1c2yEAE/review"
 GOOGLE_RATING = "5.0"
 GOOGLE_COUNT = 95          # update when the count moves (checked 11/16/2026)
 SLOGAN = "Rooted in Faith. Built on Trust. Thankful in All."
+SLOGAN_HTML = "<span>Rooted in Faith.</span> <span>Built on Trust.</span> <span>Thankful in All.</span>"
 VERSE = "Rooted and built up in Him, established in the faith, overflowing with thankfulness."
 VERSE_REF = "Colossians 2:7"
 # Bill Purcell tribute video on YouTube: "In Memory of Bill Purcell - Deeply Rooted Mechanical"
@@ -120,16 +121,11 @@ REVIEWS = {
     "corey": ("Corey De Luca", "Service call", "r", "The owner Matt is hands down one of the nicest business owners I've interacted with. He listened to my concerns and explained everything thoroughly. The technician was extremely kind, knowledgeable and honest. I highly recommend them!"),
 }
 
-# Project types only, no customer or GC names (Matt's rule, 11/16/2026). Source: DRM projects list.
+# Featured projects (Matt 11/16: names OK; only projects with real photos and confirmed facts).
 PROJECTS = [
-    ("library-crane.jpg", "building", "Township library", "90-ton rooftop unit and heating and ventilating replacement, contracted direct with the owner.", ["Rooftop units", "Completed 2026"]),
-    ("retail-rtu.jpg", "building", "Retail building", "Rooftop unit replacement: crane lift, curb work and startup.", ["Rooftop units", "2026"]),
-    (None, "building", "Church", "20,000 SF new building. Design-build mechanical with the general contractor.", ["Design-build", "In progress"]),
-    (None, "snow", "Ice rink", "11,000 SF new building. Design-build mechanical.", ["Design-build", "In progress"]),
-    (None, "clipboard", "Equipment dealer offices", "9,000 SF office build-out. Design-build mechanical.", ["Design-build", "Completed 2024"]),
-    (None, "building", "Church addition", "10,000 SF addition, HVAC and ductwork with the general contractor.", ["Plan and spec", "Completed 2025"]),
-    (None, "shield", "Federal courthouse", "HVAC scope inside an occupied federal building.", ["Government", "Completed 2026"]),
-    (None, "wrench", "Manufacturer", "4,500 SF office addition and shop renovation. Design-build mechanical.", ["Design-build", "Completed 2025"]),
+    ("library-crane.jpg", "building", "Springfield Township Library", "90-ton rooftop unit and heating and ventilating replacement, contracted direct with the township. Our largest project to date.", ["Rooftop units", "Owner direct", "Completed 2026"]),
+    ("arbon-buildout.jpg", "duct", "Arbon Equipment", "9,000 SF office build-out. Design-build HVAC and ductwork with Schafer Construction.", ["Design-build", "Completed 2024"]),
+    ("retail-rtu.jpg", "building", "Frames &amp; More", "Rooftop unit replacement: crane lift, setting and startup on an occupied retail building.", ["Rooftop units", "Retail"]),
 ]
 
 CITIES = [
@@ -148,7 +144,7 @@ TRUST = [
 
 NAV = [("/", "Home", None),
        ("/commercial", "Commercial", [("/commercial", "Commercial HVAC"), ("/rtu-replacement", "Rooftop unit replacement"),
-                                      ("/design-build", "Design-build and general contractors"), ("/projects", "Recent projects")]),
+                                      ("/design-build", "Design-build and general contractors"), ("/projects", "Featured projects")]),
        ("/residential", "Residential", None),
        ("/commercial-maintenance", "Maintenance", [("/commercial-maintenance", "Commercial maintenance agreements"),
                                                     ("/rooted-assurance-program", "Home maintenance plans")]),
@@ -242,7 +238,7 @@ def header(path):
 def footer():
     return f"""</main>
 <section class="verse"><div class="wrap">
-<p class="slogan-big">{SLOGAN}</p>
+<p class="slogan-big">{SLOGAN_HTML}</p>
 <p class="verse-text">"{VERSE}" <span>{VERSE_REF}</span></p>
 </div></section>
 <footer class="site"><div class="wrap cols">
@@ -262,7 +258,7 @@ def footer():
 </div>
 <div>
 <h3>Reviews and social</h3>
-<ul class="flinks"><li><a href="{GOOGLE_PROFILE}" rel="noopener"><span data-g="rating">{GOOGLE_RATING}</span> stars, <span data-g="count">{GOOGLE_COUNT}</span> Google reviews</a></li><li><a href="{GOOGLE_REVIEW}" rel="noopener">Leave us a Google review</a></li><li><a href="{FACEBOOK}" rel="noopener">Facebook</a></li><li><a href="{LINKEDIN}" rel="noopener">LinkedIn</a></li><li><a href="/projects">Recent projects</a></li></ul>
+<ul class="flinks"><li><a href="{GOOGLE_PROFILE}" rel="noopener"><span data-g="rating">{GOOGLE_RATING}</span> stars, <span data-g="count">{GOOGLE_COUNT}</span> Google reviews</a></li><li><a href="{GOOGLE_REVIEW}" rel="noopener">Leave us a Google review</a></li><li><a href="{FACEBOOK}" rel="noopener">Facebook</a></li><li><a href="{LINKEDIN}" rel="noopener">LinkedIn</a></li><li><a href="/projects">Featured projects</a></li></ul>
 </div>
 </div>
 <div class="wrap legal"><p>&copy; 2026 {LEGAL}. Heating and cooling for businesses and homes across {AREA}.</p>
@@ -288,12 +284,12 @@ def img(name, alt, cls="", lazy=True):
 def buttons(dark=True, kind="all"):
     """The calls to action, always in Matt's order: service, assessment, quote."""
     pri = "btn-white" if dark else "btn-navy"
-    sec = "btn-steel" if dark else "btn-charcoal"
+    sec = "btn-outline on-dark" if dark else "btn-outline"
     out = ['<div class="cta-row">',
            f'<a class="btn {pri}" href="/contact?type=service">{icon("wrench", 20)} Request Service</a>']
     if kind == "gc":     # general contractors: quote first
         return (f'<div class="cta-row"><a class="btn {pri}" href="/contact?type=quote">{icon("clipboard", 20)} Send us your project</a>'
-                f'<a class="btn btn-outline{" on-dark" if dark else ""}" href="/projects">{icon("building", 20)} Recent projects</a></div>')
+                f'<a class="btn btn-outline{" on-dark" if dark else ""}" href="/projects">{icon("building", 20)} Featured projects</a></div>')
     if kind == "home":   # residential pages: no commercial assessment
         out.append(f'<a class="btn {sec}" href="/contact?type=quote">{icon("clipboard", 20)} Request a Quote</a>')
         out.append(f'<a class="btn btn-outline{" on-dark" if dark else ""}" href="/rooted-assurance-program">{icon("calendar", 20)} Maintenance Plans</a>')
@@ -384,17 +380,17 @@ def icon_cards(cards, cols=3):
 def project_cards(items):
     out = []
     for im, ic, t, d, tags in items:
-        top = img(im, f"{t} project by {NAME}") if im else f'<div class="proj-ph">{icon(ic, 40)}</div>'
+        top = img(im, f"{html.unescape(t)} project by {NAME}") if im else f'<div class="proj-ph">{icon(ic, 40)}</div>'
         tg = "".join(f"<span>{e(x)}</span>" for x in tags)
-        out.append(f'<li>{top}<div><h3>{e(t)}</h3><p>{e(d)}</p><p class="tags">{tg}</p></div></li>')
+        out.append(f'<li>{top}<div><h3>{t}</h3><p>{e(d)}</p><p class="tags">{tg}</p></div></li>')
     return '<ul class="projects">' + "".join(out) + '</ul>'
 
 
-def projects_section(n=None, head_txt="Recent projects", link=True):
+def projects_section(n=None, head_txt="Featured projects", link=True):
     items = PROJECTS[:n] if n else PROJECTS
-    more = '<div class="center"><a class="btn btn-navy" href="/projects">See all recent projects</a></div>' if link else ""
+    more = '<div class="center"><a class="btn btn-outline" href="/projects">See the project video and more</a></div>' if link else ""
     return f"""<section class="proj-sec"><div class="wrap">
-<div class="section-head center"><h2>{head_txt}</h2><p>A sample of the commercial work our crews have completed and have underway across Southeast Michigan.</p></div>
+<div class="section-head center"><h2>{head_txt}</h2><p>A few of the commercial jobs our crews have completed across Southeast Michigan.</p></div>
 {project_cards(items)}
 {more}
 </div></section>
@@ -422,7 +418,8 @@ def faq_html(faqs):
 # ---------------- pages ----------------
 HOME = f"""<section class="hero" style="--hero:url('/assets/img/rtu-crane.jpg')"><div class="wrap">
 <div class="hero-copy">
-<p class="hero-slogan">{SLOGAN}</p>
+<img class="hero-logo" src="/assets/logo.png" alt="{NAME} logo" width="132" height="132">
+<p class="hero-slogan">{SLOGAN_HTML}</p>
 <h1>Commercial HVAC you can count on, across Southeast Michigan.</h1>
 <p>Rooftop unit repair and replacement, maintenance agreements, design-build and tenant build-outs, and 24/7 emergency service for building owners, property managers and general contractors. Homeowners too.</p>
 {buttons(dark=True)}
@@ -432,10 +429,10 @@ HOME = f"""<section class="hero" style="--hero:url('/assets/img/rtu-crane.jpg')"
 {trust_strip()}
 
 <section class="video-feature"><div class="wrap video-inner">
-<div class="video-frame"><video controls preload="none" playsinline poster="/assets/video/springfield-poster.jpg" src="/assets/video/springfield-rtu-replacement.mp4" aria-label="Rooftop unit replacement job tour at a township library"></video></div>
+<div class="video-frame"><video controls preload="none" playsinline poster="/assets/video/springfield-poster.jpg" src="/assets/video/springfield-rtu-replacement.mp4" aria-label="Rooftop unit replacement job tour at Springfield Township Library"></video></div>
 <div>
 <h2>See us at work</h2>
-<p>A 90-ton rooftop unit replacement at a township library: old units out, new units lifted by crane, set and started up by our crew.</p>
+<p>A 90-ton rooftop unit replacement at Springfield Township Library: old units out, new units lifted by crane, set and started up by our crew.</p>
 <a class="btn btn-white" href="/rtu-replacement">{icon("building", 20)} Rooftop unit replacement</a>
 </div>
 </div></section>
@@ -495,7 +492,7 @@ COMMERCIAL = f"""<section class="page-hero" style="--hero:url('/assets/img/rooft
 ])}
 </div></section>
 
-{projects_section(6)}
+{projects_section()}
 
 <section class="split"><div class="wrap split-inner">
 {img("lift-ductwork.jpg", "Crew installing ductwork from a scissor lift", lazy=False)}
@@ -561,7 +558,7 @@ RTU = f"""<section class="page-hero" style="--hero:url('/assets/img/library-cran
 </div></section>
 
 <section class="photo-row"><div class="section-head center"><h2>On the job</h2></div><div class="wrap">
-{img("library-crane.jpg", "Crane lifting rooftop units at a township library")}
+{img("library-crane.jpg", "Crane lifting rooftop units at Springfield Township Library")}
 {img("rtu-delivery.jpg", "New rooftop unit on a flatbed ready for the lift")}
 {img("rtu-set.jpg", "Crew setting a rooftop unit on its curb")}
 </div></section>
@@ -625,7 +622,7 @@ COMM_PM = f"""<section class="page-hero" style="--hero:url('/assets/img/service-
 DESIGN_BUILD = f"""<section class="page-hero" style="--hero:url('/assets/img/buildout.jpg')"><div class="wrap">
 <h1>Design-build mechanical for general contractors and owners</h1>
 <p>Design-build and plan and spec HVAC for new buildings, additions and tenant build-outs. We find the savings in design, before they turn into change orders.</p>
-<div class="cta-row"><a class="btn btn-white" href="/contact?type=quote">{icon("clipboard", 20)} Send us your project</a><a class="btn btn-outline on-dark" href="/projects">{icon("building", 20)} Recent projects</a></div>
+<div class="cta-row"><a class="btn btn-white" href="/contact?type=quote">{icon("clipboard", 20)} Send us your project</a><a class="btn btn-outline on-dark" href="/projects">{icon("building", 20)} Featured projects</a></div>
 </div></section>
 {trust_strip()}
 
@@ -649,20 +646,20 @@ DESIGN_BUILD = f"""<section class="page-hero" style="--hero:url('/assets/img/bui
 <p>Send bid invitations and drawings through our <a href="/contact?type=quote">quote request</a>, where you can attach plans, or email <a href="mailto:Matt@DeeplyRootedHVAC.com">Matt@DeeplyRootedHVAC.com</a>.</p>
 </div>
 </div></section>
-{projects_section(6)}
+{projects_section()}
 {cta_band("Have a project out for bid?", kind="gc")}
 """
 
 PROJECTS_PAGE = f"""<section class="page-hero" style="--hero:url('/assets/img/library-crane.jpg')"><div class="wrap">
-<h1>Recent projects</h1>
+<h1>Featured projects</h1>
 <p>Rooftop unit replacements, design-build new buildings, additions and build-outs across Southeast Michigan.</p>
 {buttons(dark=True)}
 </div></section>
 <section class="video-feature"><div class="wrap video-inner">
-<div class="video-frame"><video controls preload="none" playsinline poster="/assets/video/springfield-poster.jpg" src="/assets/video/springfield-rtu-replacement.mp4" aria-label="Rooftop unit replacement job tour at a township library"></video></div>
-<div><h2>Featured: township library</h2><p>A 90-ton rooftop unit and heating and ventilating replacement, contracted direct with the owner and completed in 2026.</p></div>
+<div class="video-frame"><video controls preload="none" playsinline poster="/assets/video/springfield-poster.jpg" src="/assets/video/springfield-rtu-replacement.mp4" aria-label="Rooftop unit replacement job tour at Springfield Township Library"></video></div>
+<div><h2>Featured: Springfield Township Library</h2><p>A 90-ton rooftop unit and heating and ventilating replacement, contracted direct with the township and completed in 2026.</p></div>
 </div></section>
-{projects_section(None, "Project list", link=False)}
+{projects_section(None, "Featured projects", link=False)}
 {cta_band("Let's talk about your project.")}
 """
 
@@ -743,8 +740,9 @@ OWNER_STORY = f"""<section class="owner"><div class="wrap owner-inner">
 <h2>A note from our owner</h2>
 <p>Construction is in my roots. It was my dad's world before it was mine. I lost him young, and I came into the trades as a fatherless young man trying to start life on my own.</p>
 <p>For fifteen years, what I found was a broken industry in need of redemption. I worked for people who belittled their crews, didn't pay their subs, paid employees the bare minimum and built their businesses on the backs of those with the least. Some of them called themselves followers of Christ, but you couldn't see it in how they treated people.</p>
-<p>Along the way, God also put people in my path who showed me what a business in construction can look like when it honors Him and cares for people. I found hope. In 2024, by His grace, God called me to start Deeply Rooted Mechanical.</p>
+<p>Along the way, God put people in my path who showed me what a business in construction can look like when it honors Him and cares for people. I found hope. In 2024, by His grace, God called me to start Deeply Rooted Mechanical.</p>
 <p>Jesus said that whoever has been forgiven little loves little (Luke 7:47). I have been redeemed from much, so I want to love much, and this company is how I get to do it: caring for our people and their families, treating every customer and partner with dignity, telling the truth when it costs us, and doing work that lasts. No effort, care or kindness is wasted. God sees all of it.</p>
+<p>When I look at what the Lord has built here, I am humbled and grateful. Every crew member, every job and every open door is His provision. And to every customer and partner who has trusted us with your building, your home or your project: thank you. Your trust is a gift we never take for granted.</p>
 <p class="sign">Matt Pastor, Owner</p>
 </div>
 </div></section>
@@ -795,7 +793,7 @@ ABOUT = f"""<section class="page-hero" style="--hero:url('/assets/img/safety-ves
 {cta_band()}
 """
 
-CONTACT = f"""<section class="page-hero short"><div class="wrap">
+CONTACT = f"""<section class="page-hero short" style="--hero:url('/assets/img/service-tech.jpg')"><div class="wrap">
 <h1 id="formTitle">How can we help?</h1>
 <p id="formSub">Tell us what is going on and we will get back to you quickly. For no heat, no cooling or anything urgent, call <a href="tel:{TEL}">{PHONE}</a> and press 1, any hour.</p>
 </div></section>
@@ -855,12 +853,13 @@ CONTACT = f"""<section class="page-hero short"><div class="wrap">
 
 <aside class="contact-card">
 <h2>Reach us</h2>
-<p><strong>Call:</strong> <a href="tel:{TEL}">{PHONE}</a><br>Press 1 for service, 24/7</p>
-<p><strong>Email:</strong> <a href="mailto:{EMAIL}">{EMAIL}</a></p>
-<p><strong>Office:</strong> {STREET}<br>{CITY}, {STATE} {ZIP}</p>
-<p><strong>Hours:</strong> Mon to Fri, 7:00 AM to 4:30 PM<br>Emergency service 24/7</p>
-<p><strong>Service area:</strong> All of Southeast Michigan</p>
-<p><strong>General contractors:</strong> send bid invitations to <a href="mailto:Matt@DeeplyRootedHVAC.com">Matt@DeeplyRootedHVAC.com</a></p>
+<ul class="reach">
+<li><span class="r-ic">{icon("phone", 22)}</span><span><b>Call</b><a href="tel:{TEL}">{PHONE}</a><small>Press 1 for service, 24/7</small></span></li>
+<li><span class="r-ic">{icon("clipboard", 22)}</span><span><b>Email</b><a href="mailto:{EMAIL}">{EMAIL}</a></span></li>
+<li><span class="r-ic">{icon("building", 22)}</span><span><b>Office</b>{STREET}<br>{CITY}, {STATE} {ZIP}</span></li>
+<li><span class="r-ic">{icon("clock", 22)}</span><span><b>Hours</b>Mon to Fri, 7:00 AM to 4:30 PM<small>Emergency service 24/7</small></span></li>
+<li><span class="r-ic">{icon("wrench", 22)}</span><span><b>General contractors</b>Send bid invitations to <a href="mailto:Matt@DeeplyRootedHVAC.com">Matt@DeeplyRootedHVAC.com</a></span></li>
+</ul>
 {rating_badge()}
 </aside>
 </div></section>
@@ -940,7 +939,7 @@ PAGES = [
     ("/design-build", "design-build/index.html", f"Design-Build HVAC for General Contractors | {P}",
      "Design-build and plan and spec HVAC for general contractors and owners in Southeast Michigan, with value engineering and our own crews.", DESIGN_BUILD,
      [service_schema("Design-build HVAC", "Design-build and plan and spec commercial HVAC for new buildings, additions and tenant build-outs.", "/design-build")]),
-    ("/projects", "projects/index.html", f"Recent Commercial HVAC Projects | {P}",
+    ("/projects", "projects/index.html", f"Featured Commercial HVAC Projects | {P}",
      "Recent rooftop unit replacements, design-build new buildings, additions and build-outs across Southeast Michigan.", PROJECTS_PAGE, []),
     ("/residential", "residential/index.html", f"Furnace, AC and Boiler Service for Homes | {P}",
      "Home heating and cooling repair, replacement and maintenance across Southeast Michigan. Honest options, clean work, 24/7 emergency service.", RESIDENTIAL, []),
