@@ -6,6 +6,7 @@ Netlify publishes public/ as-is on every push to main (no build step on Netlify)
 This repo is PUBLIC: never put keys, passwords or business notes in it.
 """
 import json, os, shutil, html
+from PIL import Image
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(ROOT, "public")
@@ -19,9 +20,9 @@ EMAIL = "Service@DeeplyRootedHVAC.com"
 STREET = "102 E. Grand River Ave."
 CITY, STATE, ZIP = "Brighton", "MI", "48116"
 AREA = "all of Southeast Michigan"
+LICENSE = "7118932"   # Michigan Mechanical Contractor License (exp. 08/31/2027)
 FACEBOOK = "https://www.facebook.com/profile.php?id=61579592821615"
 LINKEDIN = "https://www.linkedin.com/company/deeply-rooted-mechanical"
-YELP = "https://www.yelp.com/biz/deeply-rooted-brighton-2"
 GOOGLE_PROFILE = "https://www.google.com/maps?cid=12884188372933293353"
 GOOGLE_REVIEW = "https://g.page/r/CSk16NMP1c2yEAE/review"
 GOOGLE_RATING = "5.0"
@@ -59,6 +60,7 @@ def icon(name, size=28):
         "arrow": '<path d="M5 12h14M13 6l6 6-6 6"/>',
         "star": '<path d="M12 2l3 6.5 7 .9-5.2 4.8 1.4 7L12 17.8 5.8 21.2l1.4-7L2 9.4l7-.9z"/>',
         "check": '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+        "menu": '<path d="M4 7h16M4 12h16M4 17h16"/>',
     }[name]
     fill = "currentColor" if name == "star" else "none"
     return (f'<svg class="ic" width="{size}" height="{size}" viewBox="0 0 24 24" fill="{fill}" stroke="currentColor" '
@@ -99,44 +101,91 @@ VALUES = [
     ("heart", "Servant-Leadership", "We lead by serving first, with humility, responsiveness and a can-do attitude toward our customers and our team."),
 ]
 
-REVIEWS = [
-    ("Joe Legato", "Rooftop units", "Deeply Rooted Mechanical has been fantastic to work with. I have had them replace one rooftop unit and repair two rooftop units. In both instances they were thorough, considerate of our property, considerate of our employees, and provided expert level of professionalism at every step of the process. The next time I am in need, Matt and his team will be my first call."),
-    ("Andrew Beach", "Office furnace", "We called Deeply Rooted Mechanical the morning our furnace went out at our office. They were out same day to fix our furnace! Chase was super kind and personable as well as efficient. I highly recommend this company for all of your HVAC needs!"),
-    ("Anthony Progar", "Boiler repair", "After our hydro-static boiler that provides radiant heat and hot water stopped working, we called Deeply Rooted Mechanical. We're extremely satisfied with the service. Chase showed up on time and listened as I explained the issue. He took his time looking things over and found a bad part which he replaced. The cost was very reasonable."),
-    ("Steven Finlayson", "Furnace, AC and thermostat", "We needed the works, new A/C condenser, new furnace, new thermostat, you name it, and we were very pleased not only with the upgrade in equipment, but with the service provided. Matt and his crew were polite, respectful of our time, and very professional."),
-    ("Kathy Flowers", "Heating repair", "Chase and Deeply Rooted Mechanical helped me solve my complicated issues regarding my furnace problems and heat distribution throughout my home. He communicated well, with integrity and respect, and worked to address the issue in a way that was least expensive. Highly recommend them!"),
-    ("Laura C", "Service call", "Excellent service! Very prompt and professional! We called on a Monday afternoon and had a technician at our home by Tuesday afternoon to fix our system. They even talked me through how to turn off the water to my leaking humidifier via text Monday night."),
-    ("Madeline Dunn", "Furnace and ductwork", "They fixed an overheating problem without adding extra lines and looked at the bigger picture. They were professional, took their shoes off, and even made sure my furnace didn't overheat. I interviewed three HVAC companies and definitely made the right choice. They treated us like family and offered a fair price."),
-    ("Corey De Luca", "Service call", "The owner Matt is hands down one of the nicest business owners I've interacted with. He listened to my concerns and explained everything thoroughly. The technician was extremely kind, knowledgeable and honest. I highly recommend them!"),
+
+# kind: "c" = commercial customer, "r" = homeowner
+REVIEWS = {
+    "joe": ("Joe Legato", "Rooftop units", "c", "Deeply Rooted Mechanical has been fantastic to work with. I have had them replace one rooftop unit and repair two rooftop units. In both instances they were thorough, considerate of our property, considerate of our employees, and provided expert level of professionalism at every step of the process. The next time I am in need, Matt and his team will be my first call."),
+    "andrew": ("Andrew Beach", "Office furnace", "c", "We called Deeply Rooted Mechanical the morning our furnace went out at our office. They were out same day to fix our furnace! Chase was super kind and personable as well as efficient. I highly recommend this company for all of your HVAC needs!"),
+    "anthony": ("Anthony Progar", "Boiler repair", "r", "After our hydro-static boiler that provides radiant heat and hot water stopped working, we called Deeply Rooted Mechanical. We're extremely satisfied with the service. Chase showed up on time and listened as I explained the issue. He took his time looking things over and found a bad part which he replaced. The cost was very reasonable."),
+    "steven": ("Steven Finlayson", "Furnace, AC and thermostat", "r", "We needed the works, new A/C condenser, new furnace, new thermostat, you name it, and we were very pleased not only with the upgrade in equipment, but with the service provided. Matt and his crew were polite, respectful of our time, and very professional."),
+    "kathy": ("Kathy Flowers", "Heating repair", "r", "Chase and Deeply Rooted Mechanical helped me solve my complicated issues regarding my furnace problems and heat distribution throughout my home. He communicated well, with integrity and respect, and worked to address the issue in a way that was least expensive. Highly recommend them!"),
+    "laura": ("Laura C", "Service call", "r", "Excellent service! Very prompt and professional! We called on a Monday afternoon and had a technician at our home by Tuesday afternoon to fix our system. They even talked me through how to turn off the water to my leaking humidifier via text Monday night."),
+    "madeline": ("Madeline Dunn", "Furnace and ductwork", "r", "They fixed an overheating problem without adding extra lines and looked at the bigger picture. They were professional, took their shoes off, and even made sure my furnace didn't overheat. I interviewed three HVAC companies and definitely made the right choice. They treated us like family and offered a fair price."),
+    "corey": ("Corey De Luca", "Service call", "r", "The owner Matt is hands down one of the nicest business owners I've interacted with. He listened to my concerns and explained everything thoroughly. The technician was extremely kind, knowledgeable and honest. I highly recommend them!"),
+}
+
+# Project types only, no customer or GC names (Matt's rule, 11/16/2026). Source: DRM projects list.
+PROJECTS = [
+    ("library-crane.jpg", "building", "Township library", "90-ton rooftop unit and heating and ventilating replacement, contracted direct with the owner.", ["Rooftop units", "Completed 2026"]),
+    ("retail-rtu.jpg", "building", "Retail building", "Rooftop unit replacement: crane lift, curb work and startup.", ["Rooftop units", "2026"]),
+    (None, "building", "Church", "20,000 SF new building. Design-build mechanical with the general contractor.", ["Design-build", "In progress"]),
+    (None, "snow", "Ice rink", "11,000 SF new building. Design-build mechanical.", ["Design-build", "In progress"]),
+    (None, "clipboard", "Equipment dealer offices", "9,000 SF office build-out. Design-build mechanical.", ["Design-build", "Completed 2024"]),
+    (None, "building", "Church addition", "10,000 SF addition, HVAC and ductwork with the general contractor.", ["Plan and spec", "Completed 2025"]),
+    (None, "shield", "Federal courthouse", "HVAC scope inside an occupied federal building.", ["Government", "Completed 2026"]),
+    (None, "wrench", "Manufacturer", "4,500 SF office addition and shop renovation. Design-build mechanical.", ["Design-build", "Completed 2025"]),
 ]
 
-NAV = [("/", "Home"), ("/Commercial", "Commercial"), ("/Residential", "Residential"),
-       ("/rooted-assurance-program", "Maintenance Plans"), ("/about-us", "About"), ("/contact", "Contact")]
+CITIES = [
+    ("Livingston County", ["Brighton", "Howell", "Hartland", "Pinckney", "Fowlerville"]),
+    ("Oakland County", ["Novi", "Milford", "Highland", "Wixom", "Commerce", "Farmington Hills", "Troy"]),
+    ("Genesee County", ["Fenton", "Linden", "Grand Blanc", "Flint"]),
+    ("Wayne County", ["Livonia", "Northville", "Plymouth", "Canton", "Detroit"]),
+]
+
+TRUST = [
+    ("shield", "Licensed and insured", f"MI Mechanical Contractor #{LICENSE}"),
+    ("building", "90+ projects completed", "Established 2024"),
+    ("check", "1-year workmanship guarantee", "Plus manufacturer warranties"),
+    ("clock", "24/7 emergency service", f"Call {PHONE}, press 1"),
+]
+
+NAV = [("/", "Home", None),
+       ("/commercial", "Commercial", [("/commercial", "Commercial HVAC"), ("/rtu-replacement", "Rooftop unit replacement"),
+                                      ("/design-build", "Design-build and general contractors"), ("/projects", "Recent projects")]),
+       ("/residential", "Residential", None),
+       ("/commercial-maintenance", "Maintenance", [("/commercial-maintenance", "Commercial maintenance agreements"),
+                                                    ("/rooted-assurance-program", "Home maintenance plans")]),
+       ("/about-us", "About", None),
+       ("/contact", "Contact", None)]
 
 
 def schema():
+    cities = [c for _, cs in CITIES for c in cs]
     return {
-        "@context": "https://schema.org", "@type": "HVACBusiness",
+        "@context": "https://schema.org", "@type": "HVACBusiness", "@id": SITE + "/#business",
         "name": NAME, "legalName": LEGAL, "url": SITE + "/",
         "logo": SITE + "/assets/logo.png", "image": SITE + "/assets/img/rtu-crane.jpg",
-        "telephone": PHONE, "email": EMAIL,
+        "telephone": PHONE, "email": EMAIL, "foundingDate": "2024",
         "address": {"@type": "PostalAddress", "streetAddress": STREET, "addressLocality": CITY,
                     "addressRegion": STATE, "postalCode": ZIP, "addressCountry": "US"},
         "openingHoursSpecification": [{"@type": "OpeningHoursSpecification",
                                        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
                                        "opens": "07:00", "closes": "16:30"}],
         "areaServed": [{"@type": "AdministrativeArea", "name": n} for n in
-                       ["Southeast Michigan", "Livingston County, MI", "Oakland County, MI",
-                        "Genesee County, MI", "Wayne County, MI"]],
+                       ["Southeast Michigan"] + [c + ", MI" for c, _ in CITIES]] +
+                      [{"@type": "City", "name": c + ", MI"} for c in cities],
         "aggregateRating": {"@type": "AggregateRating", "ratingValue": GOOGLE_RATING, "reviewCount": GOOGLE_COUNT},
         "knowsAbout": ["Commercial HVAC", "Rooftop unit (RTU) replacement", "Commercial HVAC maintenance agreements",
                        "Design-build HVAC", "Tenant build-out HVAC", "Sheet metal ductwork", "Boiler service",
                        "Ductless mini split systems", "Furnace repair", "Air conditioning repair"],
-        "slogan": SLOGAN, "sameAs": [FACEBOOK, LINKEDIN, YELP, GOOGLE_PROFILE],
+        "slogan": SLOGAN, "sameAs": [FACEBOOK, LINKEDIN, GOOGLE_PROFILE],
     }
 
 
-def head(title, desc, path):
+def service_schema(name, desc, path):
+    return {"@context": "https://schema.org", "@type": "Service", "name": name, "description": desc,
+            "serviceType": name, "url": SITE + path, "provider": {"@id": SITE + "/#business"},
+            "areaServed": {"@type": "AdministrativeArea", "name": "Southeast Michigan"}}
+
+
+def faq_schema(faqs):
+    return {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
+        {"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in faqs]}
+
+
+def head(title, desc, path, extra):
+    blocks = "".join(f'<script type="application/ld+json">{json.dumps(s)}</script>' for s in [schema()] + extra)
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -150,27 +199,37 @@ def head(title, desc, path):
 <meta property="og:description" content="{e(desc)}">
 <meta property="og:url" content="{SITE}{path}">
 <meta property="og:image" content="{SITE}/assets/img/rtu-crane.jpg">
+<meta name="theme-color" content="#14263d">
 <link rel="icon" type="image/png" href="/assets/favicon.png">
 <link rel="stylesheet" href="/assets/style.css">
-<script type="application/ld+json">{json.dumps(schema())}</script>
+{blocks}
 </head>
 <body>
 """
 
 
 def header(path):
-    links = "".join(
-        f'<a href="{h}"{" aria-current=\"page\"" if h == path else ""}>{t}</a>' for h, t in NAV)
-    return f"""<div class="topbar"><div class="wrap">
+    items = []
+    for h, t, sub in NAV:
+        cur = ' aria-current="page"' if (h == path or (sub and any(s == path for s, _ in sub))) else ""
+        if sub:
+            subs = "".join(f'<a href="{s}"{" aria-current=\"page\"" if s == path else ""}>{st}</a>' for s, st in sub)
+            items.append(f'<div class="has-sub"><a href="{h}"{cur}>{t} <span class="caret" aria-hidden="true"></span></a><div class="sub">{subs}</div></div>')
+        else:
+            items.append(f'<a href="{h}"{cur}>{t}</a>')
+    return f"""<a class="skip" href="#main">Skip to content</a>
+<div class="topbar"><div class="wrap">
 <span class="slogan-mini">{SLOGAN}</span>
-<a href="tel:{TEL}">{icon("phone", 16)} {PHONE} &middot; 24/7</a>
+<a href="tel:{TEL}">{icon("phone", 16)} {PHONE} &middot; Emergency service 24/7</a>
 </div></div>
 <header class="site"><div class="wrap">
-<a class="brand" href="/"><img src="/assets/logo.png" alt="{NAME} logo" width="58" height="58"><span class="brand-name"><b>Deeply Rooted</b><b>Mechanical</b></span></a>
-<nav aria-label="Main">{links}</nav>
+<a class="brand" href="/"><img src="/assets/logo.png" alt="{NAME} logo" width="56" height="56"><span class="brand-name"><b>Deeply Rooted</b><b>Mechanical</b></span></a>
+<nav id="mainnav" aria-label="Main">{"".join(items)}</nav>
 <a class="btn btn-gold hdr-cta" href="/contact?type=service">Request Service</a>
+<a class="icon-btn hdr-call" href="tel:{TEL}" aria-label="Call {PHONE}">{icon("phone", 22)}</a>
+<button class="icon-btn menu-btn" type="button" aria-controls="mainnav" aria-expanded="false" aria-label="Menu">{icon("menu", 24)}</button>
 </div></header>
-<main>
+<main id="main">
 """
 
 
@@ -184,75 +243,92 @@ def footer():
 <div>
 <img src="/assets/logo.png" alt="" width="72" height="72">
 <p><strong>{NAME}</strong><br>{STREET}<br>{CITY}, {STATE} {ZIP}</p>
+<p class="small">Michigan Mechanical Contractor License #{LICENSE}<br>Licensed and insured. Established 2024.</p>
 </div>
 <div>
 <h3>Contact</h3>
-<p><a href="tel:{TEL}">{PHONE}</a> (press 1 for service)<br><a href="mailto:{EMAIL}">{EMAIL}</a></p>
+<ul class="flinks"><li><a href="tel:{TEL}">{PHONE}</a> (press 1 for service)</li><li><a href="mailto:{EMAIL}">{EMAIL}</a></li></ul>
 <p>Office: Mon to Fri, 7:00 AM to 4:30 PM<br>Emergency service 24/7</p>
 </div>
 <div>
 <h3>Services</h3>
-<p><a href="/Commercial">Commercial HVAC</a><br><a href="/Residential">Residential HVAC</a><br><a href="/rooted-assurance-program">Maintenance plans</a><br><a href="/contact?type=assessment">Free Equipment Assessment</a></p>
+<ul class="flinks"><li><a href="/commercial">Commercial HVAC</a></li><li><a href="/rtu-replacement">Rooftop unit replacement</a></li><li><a href="/commercial-maintenance">Commercial maintenance</a></li><li><a href="/design-build">Design-build and GCs</a></li><li><a href="/residential">Residential HVAC</a></li><li><a href="/rooted-assurance-program">Home maintenance plans</a></li></ul>
 </div>
 <div>
 <h3>Reviews and social</h3>
-<p><a href="{GOOGLE_PROFILE}" rel="noopener"><span data-g="rating">{GOOGLE_RATING}</span> stars, <span data-g="count">{GOOGLE_COUNT}</span> Google reviews</a><br><a href="{GOOGLE_REVIEW}" rel="noopener">Leave us a Google review</a><br><a href="{FACEBOOK}" rel="noopener">Facebook</a> &middot; <a href="{LINKEDIN}" rel="noopener">LinkedIn</a></p>
+<ul class="flinks"><li><a href="{GOOGLE_PROFILE}" rel="noopener"><span data-g="rating">{GOOGLE_RATING}</span> stars, <span data-g="count">{GOOGLE_COUNT}</span> Google reviews</a></li><li><a href="{GOOGLE_REVIEW}" rel="noopener">Leave us a Google review</a></li><li><a href="{FACEBOOK}" rel="noopener">Facebook</a></li><li><a href="{LINKEDIN}" rel="noopener">LinkedIn</a></li><li><a href="/projects">Recent projects</a></li></ul>
 </div>
 </div>
-<div class="wrap legal"><p>&copy; 2026 {LEGAL}. Heating and cooling for homes and businesses across {AREA}.</p>
+<div class="wrap legal"><p>&copy; 2026 {LEGAL}. Heating and cooling for businesses and homes across {AREA}.</p>
 <p><a href="/privacy-policy">Privacy Policy</a> &middot; <a href="/terms-of-service">Terms of Service</a></p></div>
 </footer>
+<div class="mbar"><a href="tel:{TEL}">{icon("phone", 20)} Call</a><a class="mbar-main" href="/contact?type=service">{icon("wrench", 20)} Request Service</a></div>
 <script src="/assets/site.js" defer></script>
 </body>
 </html>
 """
 
 
-def page(path, title, desc, body):
-    return head(title, desc, path) + header(path) + body + footer()
+def page(path, title, desc, body, extra=()):
+    return head(title, desc, path, list(extra)) + header(path) + body + footer()
 
 
-def buttons(dark=True, plans=False):
-    """The three calls to action, always in Matt's order."""
-    third = ('<a class="btn btn-outline{d}" href="/contact?type=quote">{i} Request a Quote</a>'
-             .format(d=" on-dark" if dark else "", i=icon("clipboard", 20)))
-    second_href = "/rooted-assurance-program" if plans else "/contact?type=assessment"
-    second_txt = "Maintenance Plans" if plans else "Free Equipment Assessment"
-    second_cls = "btn-white" if dark else "btn-navy"
-    return (f'<div class="cta-row">'
-            f'<a class="btn btn-gold" href="/contact?type=service">{icon("wrench", 20)} Request Service</a>'
-            f'<a class="btn {second_cls}" href="{second_href}">{icon("calendar", 20)} {second_txt}</a>'
-            f'{third}</div>')
+def img(name, alt, cls="", lazy=True):
+    w, h = Image.open(os.path.join(ROOT, "assets", "img", name)).size
+    return (f'<img src="/assets/img/{name}" alt="{e(alt)}" width="{w}" height="{h}"'
+            f'{" loading=\"lazy\"" if lazy else ""}{f" class=\"{cls}\"" if cls else ""}>')
 
 
-def cta_band(text="Let us serve you!"):
+def buttons(dark=True, kind="all"):
+    """The calls to action, always in Matt's order: service, assessment, quote."""
+    sec = "btn-white" if dark else "btn-navy"
+    out = ['<div class="cta-row">',
+           f'<a class="btn btn-gold" href="/contact?type=service">{icon("wrench", 20)} Request Service</a>']
+    if kind == "home":   # residential pages: no commercial assessment
+        out.append(f'<a class="btn {sec}" href="/contact?type=quote">{icon("clipboard", 20)} Request a Quote</a>')
+        out.append(f'<a class="btn btn-outline{" on-dark" if dark else ""}" href="/rooted-assurance-program">{icon("calendar", 20)} Maintenance Plans</a>')
+    else:
+        out.append(f'<a class="btn {sec}" href="/contact?type=assessment">{icon("calendar", 20)} Free Equipment Assessment</a>')
+        out.append(f'<a class="btn btn-outline{" on-dark" if dark else ""}" href="/contact?type=quote">{icon("clipboard", 20)} Request a Quote</a>')
+    out.append('</div>')
+    return "".join(out)
+
+
+def cta_band(text="Let us serve you!", kind="all"):
     return f"""<section class="cta-band"><div class="wrap">
 <h2>{text}</h2>
-{buttons(dark=True)}
+{buttons(dark=True, kind=kind)}
 <p class="cta-phone">Or call <a href="tel:{TEL}">{PHONE}</a> and press 1 for service, 24/7.</p>
 </div></section>
 """
 
 
 def rating_badge(cls=""):
-    return (f'<a class="rating {cls}" href="{GOOGLE_PROFILE}" rel="noopener" aria-label="Read our {GOOGLE_COUNT} Google reviews">'
+    return (f'<a class="rating {cls}" href="{GOOGLE_PROFILE}" rel="noopener" aria-label="Read our Google reviews">'
             f'<span class="stars">{STARS}</span><span class="rating-text"><b><span data-g="rating">{GOOGLE_RATING}</span></b> from <b><span data-g="count">{GOOGLE_COUNT}</span></b> Google reviews</span></a>')
 
 
-def reviews_block(n=6):
+def trust_strip():
+    items = "".join(f'<li><span class="t-ic">{icon(ic, 26)}</span><span><b>{t}</b><small>{s}</small></span></li>' for ic, t, s in TRUST)
+    star = (f'<li><span class="t-ic gold">{icon("star", 26)}</span><span><b><span data-g="rating">{GOOGLE_RATING}</span> stars on Google</b>'
+            f'<small><span data-g="count">{GOOGLE_COUNT}</span> reviews</small></span></li>')
+    return f'<section class="trust" aria-label="Why customers trust us"><div class="wrap"><ul>{items}{star}</ul></div></section>'
+
+
+def reviews_block(keys, title=None):
     cards = "".join(
         f'<figure class="review"><div class="stars small">{"".join(icon("star", 18) for _ in range(5))}</div>'
-        f'<blockquote>{e(t)}</blockquote><figcaption><span class="avatar">{e(name[0])}</span><span><b>{e(name)}</b>'
+        f'<blockquote>{e(t)}</blockquote><figcaption><span class="avatar">{e(n[0])}</span><span><b>{e(n)}</b>'
         f'<small>{e(kind)} &middot; Google review</small></span></figcaption></figure>'
-        for name, kind, t in REVIEWS[:n])
+        for n, kind, _, t in (REVIEWS[k] for k in keys))
     return f"""<section class="reviews"><div class="wrap">
 <div class="reviews-head">
-<div><h2>Rated <span data-g="rating">{GOOGLE_RATING}</span> stars on <span data-g="count">{GOOGLE_COUNT}</span> Google reviews</h2>
-<p>Here is what customers say about working with us.</p></div>
+<div><h2>{title or f'Rated <span data-g="rating">{GOOGLE_RATING}</span> stars on <span data-g="count">{GOOGLE_COUNT}</span> Google reviews'}</h2>
+<p>Real reviews from our customers on Google.</p></div>
 <div class="score"><span class="score-num"><span data-g="rating">{GOOGLE_RATING}</span></span><span class="stars">{STARS}</span><span><span data-g="count">{GOOGLE_COUNT}</span> Google reviews</span></div>
 </div>
-<div class="review-grid">{cards}</div>
-<div class="center"><a class="btn btn-navy" href="{GOOGLE_PROFILE}" rel="noopener">Read all <span data-g="count">{GOOGLE_COUNT}</span> reviews on Google</a>
+<div class="review-grid n{len(keys)}">{cards}</div>
+<div class="center btn-pair"><a class="btn btn-navy" href="{GOOGLE_PROFILE}" rel="noopener">Read all <span data-g="count">{GOOGLE_COUNT}</span> reviews on Google</a>
 <a class="btn btn-outline" href="{GOOGLE_REVIEW}" rel="noopener">Leave us a review</a></div>
 </div></section>
 """
@@ -260,7 +336,7 @@ def reviews_block(n=6):
 
 def team_block():
     cards = "".join(
-        f'<figure class="person"><img src="/assets/team/{k}.jpg" alt="{e(n)}, {e(t)}" width="400" height="400">'
+        f'<figure class="person"><img src="/assets/team/{k}.jpg" alt="{e(n)}, {e(t)}" width="400" height="400" loading="lazy">'
         f'<figcaption><strong>{e(n)}</strong><span>{e(t)}</span></figcaption></figure>'
         for k, n, t in TEAM)
     return f"""<section class="team"><div class="wrap">
@@ -270,11 +346,11 @@ def team_block():
 """
 
 
-def values_block(title="Our core values", intro="Everything we do grows out of five roots."):
+def values_block(title="Our core values", intro="Everything we do grows out of five roots.", tone=""):
     items = "".join(
-        f'<li><span class="v-ic">{icon(ic, 30)}</span><span class="v-pre">Deeply Rooted in</span>'
+        f'<li><span class="v-ic">{icon(ic, 28)}</span><span class="v-pre">Deeply Rooted in</span>'
         f'<span class="v-name">{e(t)}</span><p>{e(d)}</p></li>' for ic, t, d in VALUES)
-    return f"""<section class="values"><div class="wrap">
+    return f"""<section class="values {tone}"><div class="wrap">
 <div class="section-head center"><h2>{title}</h2><p>{intro}</p></div>
 <ul class="value-list">{items}</ul>
 </div></section>
@@ -282,24 +358,58 @@ def values_block(title="Our core values", intro="Everything we do grows out of f
 
 
 def photo_cards(cards):
-    return '<ul class="photo-cards">' + "".join(
-        f'<li><img src="/assets/img/{img}" alt="{e(alt)}" loading="lazy"><div><span class="pc-ic">{icon(ic, 24)}</span>'
-        f'<h3>{e(t)}</h3><p>{e(d)}</p></div></li>' for img, alt, ic, t, d in cards) + '</ul>'
+    out = []
+    for im, alt, ic, t, d, link in cards:
+        inner = (f'{img(im, alt)}<div><span class="pc-ic">{icon(ic, 22)}</span><h3>{e(t)}</h3><p>{e(d)}</p>'
+                 + (f'<span class="more">Learn more {icon("arrow", 16)}</span>' if link else "") + '</div>')
+        out.append(f'<li>{f"<a href=\"{link}\">{inner}</a>" if link else inner}</li>')
+    return '<ul class="photo-cards">' + "".join(out) + '</ul>'
 
 
-def icon_cards(cards):
-    return '<ul class="icon-cards">' + "".join(
-        f'<li><span class="ic-wrap">{icon(ic, 30)}</span><h3>{e(t)}</h3><p>{e(d)}</p></li>' for ic, t, d in cards) + '</ul>'
+def icon_cards(cards, cols=3):
+    return f'<ul class="icon-cards c{cols}">' + "".join(
+        f'<li><span class="ic-wrap">{icon(ic, 26)}</span><h3>{e(t)}</h3><p>{e(d)}</p></li>' for ic, t, d in cards) + '</ul>'
 
 
-def slogan_band():
-    return f"""<section class="slogan-band"><div class="wrap">
-<p class="slogan-big">{SLOGAN}</p>
-<p class="verse-text">"{VERSE}" <span>{VERSE_REF}</span></p>
+def project_cards(items):
+    out = []
+    for im, ic, t, d, tags in items:
+        top = img(im, f"{t} project by {NAME}") if im else f'<div class="proj-ph">{icon(ic, 40)}</div>'
+        tg = "".join(f"<span>{e(x)}</span>" for x in tags)
+        out.append(f'<li>{top}<div><h3>{e(t)}</h3><p>{e(d)}</p><p class="tags">{tg}</p></div></li>')
+    return '<ul class="projects">' + "".join(out) + '</ul>'
+
+
+def projects_section(n=None, head_txt="Recent projects", link=True):
+    items = PROJECTS[:n] if n else PROJECTS
+    more = '<div class="center"><a class="btn btn-navy" href="/projects">See all recent projects</a></div>' if link else ""
+    return f"""<section class="proj-sec"><div class="wrap">
+<div class="section-head center"><h2>{head_txt}</h2><p>A sample of the commercial work our crews have completed and have underway across Southeast Michigan.</p></div>
+{project_cards(items)}
+{more}
 </div></section>
 """
 
 
+def steps(items):
+    return '<ol class="steps">' + "".join(f'<li><span class="n">{i}</span><h3>{e(t)}</h3><p>{e(d)}</p></li>'
+                                          for i, (t, d) in enumerate(items, 1)) + '</ol>'
+
+
+def where_we_work():
+    cols = "".join(f'<div><h3>{c}</h3><p>{", ".join(cs)}</p></div>' for c, cs in CITIES)
+    return f"""<section class="where"><div class="wrap">
+<div class="section-head center"><h2>Where we work</h2><p>Based in Brighton, serving businesses and homes across all of Southeast Michigan, including:</p></div>
+<div class="where-grid">{cols}</div>
+</div></section>
+"""
+
+
+def faq_html(faqs):
+    return "".join(f"<details><summary>{e(q)}</summary><p>{e(a)}</p></details>" for q, a in faqs)
+
+
+# ---------------- pages ----------------
 HOME = f"""<section class="hero" style="--hero:url('/assets/img/rtu-crane.jpg')"><div class="wrap">
 <div class="hero-copy">
 <p class="hero-slogan">{SLOGAN}</p>
@@ -309,104 +419,253 @@ HOME = f"""<section class="hero" style="--hero:url('/assets/img/rtu-crane.jpg')"
 {rating_badge("on-dark")}
 </div>
 </div></section>
+{trust_strip()}
 
 <section class="video-feature"><div class="wrap video-inner">
-<div class="video-frame"><video controls preload="metadata" playsinline poster="/assets/video/springfield-poster.jpg" src="/assets/video/springfield-rtu-replacement.mp4" aria-label="Springfield Township rooftop unit replacement job tour"></video></div>
+<div class="video-frame"><video controls preload="none" playsinline poster="/assets/video/springfield-poster.jpg" src="/assets/video/springfield-rtu-replacement.mp4" aria-label="Rooftop unit replacement job tour at a township library"></video></div>
 <div>
 <h2>See us at work</h2>
-<p>A rooftop unit replacement for Springfield Township: new units lifted by crane, set on the roof and started up by our crew.</p>
-<a class="btn btn-gold" href="/contact?type=quote">{icon("clipboard", 20)} Get a quote for your building</a>
+<p>A 90-ton rooftop unit replacement at a township library: old units out, new units lifted by crane, set and started up by our crew.</p>
+<a class="btn btn-white" href="/rtu-replacement">{icon("building", 20)} Rooftop unit replacement</a>
 </div>
 </div></section>
 
-{slogan_band()}
-
 <section class="paths"><div class="wrap">
-<a class="path" href="/Commercial"><img src="/assets/img/rtu-new.jpg" alt="DRM crew setting new rooftop units" loading="lazy"><div><h2>For your business</h2><p>RTUs, make-up air and exhaust, boilers, VRF and ductless, ductwork and preventive maintenance agreements. Built for uptime.</p><span class="more">Commercial HVAC {icon("arrow", 18)}</span></div></a>
-<a class="path" href="/Residential"><img src="/assets/img/furnace.jpg" alt="New furnace installed by Deeply Rooted Mechanical" loading="lazy"><div><h2>For your home</h2><p>Furnace, air conditioning, boiler and mini split repair and replacement, plus our Rooted Assurance maintenance plan.</p><span class="more">Residential HVAC {icon("arrow", 18)}</span></div></a>
+<a class="path" href="/commercial">{img("rtu-new.jpg", "Crew setting new rooftop units")}<div><h2>For your business</h2><p>RTUs, make-up air and exhaust, boilers, VRF and ductless, ductwork and preventive maintenance agreements. Built for uptime.</p><span class="more">Commercial HVAC {icon("arrow", 18)}</span></div></a>
+<a class="path" href="/residential">{img("furnace.jpg", "New furnace installed by Deeply Rooted Mechanical")}<div><h2>For your home</h2><p>Furnace, air conditioning, boiler and mini split repair and replacement, plus our Rooted Assurance maintenance plans.</p><span class="more">Residential HVAC {icon("arrow", 18)}</span></div></a>
 </div></section>
 
 <section class="services"><div class="wrap">
 <div class="section-head center"><h2>What we do</h2><p>Heating and cooling, done right the first time.</p></div>
 {photo_cards([
-    ("rtu-set.jpg", "Crew setting a new rooftop unit on its curb", "building", "Rooftop unit repair and replacement", "Diagnosis, repair and full RTU changeouts, including crane lifts, curbs and startup."),
-    ("service-tech.jpg", "Technicians working inside a rooftop unit", "clipboard", "Maintenance agreements", "Scheduled visits with filters included, priority scheduling, 10% off repairs and a written report after every visit."),
-    ("buildout.jpg", "Crew installing spiral duct on a tenant build-out", "wrench", "Design-build and build-outs", "Mechanical partner for general contractors on new construction and tenant build-outs, from planning to closeout."),
-    ("ductwork.jpg", "Installer connecting ductwork", "duct", "Ductwork and sheet metal", "Rectangular and spiral duct, exhaust and make-up air, installed clean and on schedule."),
-    ("furnace-2.jpg", "Furnace installation", "flame", "Heating and boilers", "Furnace and boiler repair and replacement, plus CSD-1 testing for commercial boilers."),
-    ("safety-vest.jpg", "Deeply Rooted Mechanical crew member", "clock", "24/7 emergency service", "No heat, no cooling, or a unit down on a busy day. Call (810) 360-9664 and press 1, any hour."),
+    ("rtu-set.jpg", "Crew setting a new rooftop unit on its curb", "building", "Rooftop unit repair and replacement", "Diagnosis, repair and full RTU changeouts, including crane lifts, curbs and startup.", "/rtu-replacement"),
+    ("service-tech.jpg", "Technicians working inside a rooftop unit", "clipboard", "Maintenance agreements", "Scheduled visits with filters included, priority scheduling, 10% off repairs and a written report after every visit.", "/commercial-maintenance"),
+    ("buildout.jpg", "Crew installing spiral duct on a tenant build-out", "wrench", "Design-build and build-outs", "Mechanical partner for general contractors on new construction and tenant build-outs, from planning to closeout.", "/design-build"),
+    ("ductwork.jpg", "Installer connecting ductwork", "duct", "Ductwork and sheet metal", "Rectangular and spiral duct, exhaust and make-up air, installed clean and on schedule.", None),
+    ("furnace-2.jpg", "Furnace installation", "flame", "Heating and boilers", "Furnace and boiler repair and replacement, plus CSD-1 testing for commercial boilers.", None),
+    ("safety-vest.jpg", "Deeply Rooted Mechanical crew member", "clock", "24/7 emergency service", "No heat, no cooling, or a unit down on a busy day. Call (810) 360-9664 and press 1, any hour.", None),
 ])}
 </div></section>
 
+{projects_section(3)}
+
 <section class="offer"><div class="wrap offer-inner">
-<img src="/assets/img/exhaust-fan.jpg" alt="Technician inspecting rooftop exhaust fan" width="1200" height="900">
+{img("exhaust-fan.jpg", "Technician inspecting a rooftop exhaust fan", lazy=False)}
 <div>
 <h2>Free Equipment Assessment</h2>
-<p>We walk your rooftop units and mechanical equipment and give you a written condition report for every unit: what is good, what to watch, and what to budget for. No cost and no obligation.</p>
+<p>For commercial buildings. We walk your rooftop units and mechanical equipment and give you a written condition report for every unit: what is good, what to watch, and what to budget for. No cost and no obligation.</p>
 <a class="btn btn-gold" href="/contact?type=assessment">{icon("calendar", 20)} Book your free assessment</a>
 </div>
 </div></section>
 
-{reviews_block(6)}
+{reviews_block(["joe", "andrew", "steven", "kathy", "madeline", "corey"])}
 {values_block()}
 {team_block()}
+{where_we_work()}
 {cta_band()}
 """
 
 COMMERCIAL = f"""<section class="page-hero" style="--hero:url('/assets/img/rooftop-units.jpg')"><div class="wrap">
-<p class="hero-slogan">{SLOGAN}</p>
 <h1>Commercial HVAC and mechanical services built for uptime.</h1>
 <p>For facility managers, property managers, general contractors and multi-site operators across {AREA}.</p>
 {buttons(dark=True)}
 {rating_badge("on-dark")}
 </div></section>
+{trust_strip()}
 
 <section class="services"><div class="wrap">
 <div class="section-head center"><h2>Commercial service capabilities</h2><p>One mechanical partner for service, maintenance and construction.</p></div>
 {photo_cards([
-    ("rtu-set.jpg", "Crew setting a rooftop unit", "building", "Rooftop units", "Repair, troubleshooting and full replacement of packaged rooftop units, including crane lifts, curb adapters and startup. All major brands."),
-    ("service-tech.jpg", "Technicians on a maintenance visit", "clipboard", "Preventive maintenance agreements", "Scheduled visits with standard filters included, priority scheduling, 10% off repairs and a written report after every visit."),
-    ("buildout.jpg", "Crew on a tenant build-out", "wrench", "Design-build mechanical", "Mechanical partner for general contractors from planning through closeout, on new construction and tenant build-outs."),
-    ("ductwork.jpg", "Ductwork installation", "duct", "Ductwork and sheet metal", "Rectangular and spiral duct, exhaust fans and make-up air, installed clean and coordinated with the other trades."),
-    ("rtu-new.jpg", "New rooftop heating and cooling units", "flame", "Heating and boilers", "Commercial heating repair and troubleshooting, boiler service and replacement, and CSD-1 testing."),
-    ("chillers.jpg", "Commercial cooling equipment installation", "snow", "Cooling and refrigeration", "Air conditioning repair, airflow problems, VRF and ductless systems for offices and build-outs, and commercial refrigeration."),
+    ("rtu-set.jpg", "Crew setting a rooftop unit", "building", "Rooftop units", "Repair, troubleshooting and full replacement of packaged rooftop units, including crane lifts, curb adapters and startup. All major brands.", "/rtu-replacement"),
+    ("service-tech.jpg", "Technicians on a maintenance visit", "clipboard", "Preventive maintenance agreements", "Twice-a-year or quarterly visits, standard filters included, priority scheduling, 10% off repairs and a written report after every visit.", "/commercial-maintenance"),
+    ("buildout.jpg", "Crew on a tenant build-out", "wrench", "Design-build mechanical", "Mechanical partner for general contractors from planning through closeout, on new construction and tenant build-outs.", "/design-build"),
+    ("ductwork.jpg", "Ductwork installation", "duct", "Ductwork and sheet metal", "Rectangular and spiral duct, exhaust fans and make-up air, installed clean and coordinated with the other trades.", None),
+    ("rtu-new.jpg", "New rooftop heating and cooling units", "flame", "Heating and boilers", "Commercial heating repair and troubleshooting, boiler service and replacement, and CSD-1 testing.", None),
+    ("chillers.jpg", "Commercial cooling equipment installation", "snow", "Cooling and refrigeration", "Air conditioning repair, airflow problems, VRF and ductless systems for offices and build-outs, and commercial refrigeration.", None),
 ])}
 </div></section>
 
+{projects_section(6)}
+
 <section class="split"><div class="wrap split-inner">
-<img src="/assets/img/lift-ductwork.jpg" alt="Crew installing ductwork from a scissor lift" width="1200" height="900">
+{img("lift-ductwork.jpg", "Crew installing ductwork from a scissor lift", lazy=False)}
 <div>
 <h2>Working with general contractors</h2>
-<p>We bid, build and close out like a partner. Every project is led by a superintendent with 42 years of experience, with clean submittals, coordinated schedules and a crew that shows up ready to work.</p>
-<p>Have plans out for bid? Send the project to <a href="mailto:Matt@DeeplyRootedHVAC.com">Matt@DeeplyRootedHVAC.com</a> or <a href="/contact?type=quote">request a quote</a>.</p>
+<p>We bid, build and close out like a partner. Every project is led by a superintendent with 42 years of experience, with clean submittals, coordinated schedules and our own sheet metal and equipment crews.</p>
+<p>Have plans out for bid? Send them through our <a href="/contact?type=quote">quote request</a> (you can attach drawings) or email <a href="mailto:Matt@DeeplyRootedHVAC.com">Matt@DeeplyRootedHVAC.com</a>.</p>
+<a class="btn btn-navy" href="/design-build">{icon("arrow", 18)} Design-build and general contractors</a>
 </div>
 </div></section>
 
 <section class="offer"><div class="wrap offer-inner">
-<img src="/assets/img/exhaust-fan.jpg" alt="Technician inspecting rooftop exhaust fan" width="1200" height="900">
+{img("exhaust-fan.jpg", "Technician inspecting rooftop exhaust fan")}
 <div>
 <h2>Free Equipment Assessment</h2>
 <p>We walk your rooftop units and give you a written condition report for each one, with repair recommendations and a replacement budget. It is the easiest way to plan next year's HVAC spending and to see what a maintenance agreement would cost.</p>
 <a class="btn btn-gold" href="/contact?type=assessment">{icon("calendar", 20)} Book your free assessment</a>
 </div>
 </div></section>
-{reviews_block(3)}
+{reviews_block(["joe", "andrew"], "What commercial customers say")}
 {values_block("How we work", "Our core values are how we treat your building, your people and your schedule.")}
 {cta_band("Keep your building running.")}
 """
 
-RESIDENTIAL = f"""<section class="page-hero" style="--hero:url('/assets/img/condenser.jpg')"><div class="wrap">
-<p class="hero-slogan">{SLOGAN}</p>
-<h1>Home heating and cooling you can trust like a friend.</h1>
-<p>Repairs, replacements and maintenance for homes across {AREA}. Clear options, honest advice and a clean job site.</p>
-{buttons(dark=True, plans=True)}
-{rating_badge("on-dark")}
+RTU_FAQ = [
+    ("Should I repair or replace my rooftop unit?", "It depends on the unit's age, condition, refrigerant and repair history. Our Free Equipment Assessment gives you a written condition report and a replacement budget so you can decide with real numbers."),
+    ("Do you handle the crane and curb work?", "Yes. We plan the lift, arrange the crane, handle curb adapters, set the unit and start it up. Gas, electrical and roofing ties are coordinated with those trades."),
+    ("What refrigerant do new units use?", "Every new unit we install uses R-454B, the current refrigerant for new equipment."),
+    ("Do you work with property managers and multi-site owners?", "Yes. We can assess every unit across your buildings and give you one plan for repairs and replacements."),
+]
+
+RTU = f"""<section class="page-hero" style="--hero:url('/assets/img/library-crane.jpg')"><div class="wrap">
+<h1>Rooftop unit repair and replacement</h1>
+<p>From one tired unit to a full 90-ton changeout. We plan the lift, set the equipment and start it up, with as little disruption to your building as possible.</p>
+{buttons(dark=True)}
+</div></section>
+{trust_strip()}
+
+<section class="split"><div class="wrap split-inner">
+{img("rtu-changeout.jpg", "Crew disconnecting an old rooftop unit", lazy=False)}
+<div>
+<h2>What is included</h2>
+<ul class="checks">
+<li>{icon("check", 20)} Site visit and a written proposal with a clear scope</li>
+<li>{icon("check", 20)} Equipment selection and ordering, all major brands</li>
+<li>{icon("check", 20)} Crane lift planning, curb adapters and rigging</li>
+<li>{icon("check", 20)} Removal of the old unit</li>
+<li>{icon("check", 20)} Setting, connecting and starting up the new unit</li>
+<li>{icon("check", 20)} Coordination with your roofer, electrician and gas contractor</li>
+<li>{icon("check", 20)} Manufacturer warranty plus our one-year workmanship guarantee</li>
+</ul>
+</div>
 </div></section>
 
 <section class="services"><div class="wrap">
+<div class="section-head center"><h2>How a replacement works</h2></div>
+{steps([
+    ("Assess", "We look at the unit, the curb, the roof and the building, and talk with you about schedule and budget."),
+    ("Propose", "You get a written proposal with the equipment, the scope and one firm price."),
+    ("Lift day", "We plan the crane, pull the old unit and set the new one, usually around your business hours."),
+    ("Start up", "We start the unit, check it over and walk you through what was done."),
+])}
+</div></section>
+
+<section class="photo-row"><div class="wrap">
+{img("library-crane.jpg", "Crane lifting rooftop units at a township library")}
+{img("rtu-delivery.jpg", "New rooftop unit on a flatbed ready for the lift")}
+{img("rtu-set.jpg", "Crew setting a rooftop unit on its curb")}
+</div></section>
+
+<section class="faq"><div class="wrap narrow">
+<div class="section-head center"><h2>Rooftop unit questions</h2></div>
+{faq_html(RTU_FAQ)}
+</div></section>
+{reviews_block(["joe", "andrew"], "What commercial customers say")}
+{cta_band("Is a rooftop unit giving you trouble?")}
+"""
+
+PM_FAQ = [
+    ("How often do you visit?", "Twice a year (spring and fall) or four times a year (quarterly). Quarterly plans suit buildings that run hard or need tighter filter changes."),
+    ("What does a maintenance agreement cost?", "It is priced by the equipment you have and how often we visit. Start with a Free Equipment Assessment and you will get a written condition report and a maintenance proposal together."),
+    ("Do you cover more than one building?", "Yes. One agreement can cover all of your sites, with a written report for every building after each visit."),
+    ("Do you service boilers?", "Yes. CSD-1 boiler inspection is included for maintenance customers with boilers."),
+]
+
+COMM_PM = f"""<section class="page-hero" style="--hero:url('/assets/img/service-tech.jpg')"><div class="wrap">
+<h1>Commercial maintenance agreements</h1>
+<p>Fewer breakdowns, longer equipment life and a written report after every visit. Built for owners, property managers and multi-site operators.</p>
+{buttons(dark=True)}
+</div></section>
+{trust_strip()}
+
+<section class="services"><div class="wrap">
+<div class="section-head center"><h2>What every agreement includes</h2></div>
+{icon_cards([
+    ("calendar", "Scheduled visits", "Twice a year or quarterly. We put the visits on the calendar so you never have to remember."),
+    ("duct", "Standard filters included", "Filters changed at every visit, at no extra charge."),
+    ("clipboard", "Written report after every visit", "What we checked, what we found, and what to watch or budget for, unit by unit."),
+    ("bolt", "Priority scheduling", "Members move to the front of the line when something goes wrong."),
+    ("percent", "10% off repairs", "Members save on parts and labor for every repair."),
+    ("flame", "Boiler inspection", "CSD-1 boiler inspection included when your building has a boiler."),
+], cols=3)}
+</div></section>
+
+<section class="split"><div class="wrap split-inner">
+{img("exhaust-fan.jpg", "Technician inspecting a rooftop exhaust fan", lazy=False)}
+<div>
+<h2>How to get started</h2>
+{steps([
+    ("Free Equipment Assessment", "We walk every unit and give you a written condition report."),
+    ("Your maintenance proposal", "Equipment covered, visit schedule, what is included and one yearly price."),
+    ("Visits and reports", "We show up on schedule and send a report after every visit."),
+])}
+<a class="btn btn-gold" href="/contact?type=assessment">{icon("calendar", 20)} Book your free assessment</a>
+</div>
+</div></section>
+
+<section class="faq"><div class="wrap narrow">
+<div class="section-head center"><h2>Maintenance agreement questions</h2></div>
+{faq_html(PM_FAQ)}
+<p class="note center">Looking for a plan for your home? See our <a href="/rooted-assurance-program">Rooted Assurance home plans</a>.</p>
+</div></section>
+{reviews_block(["joe", "andrew"], "What commercial customers say")}
+{cta_band("Keep your building running.")}
+"""
+
+DESIGN_BUILD = f"""<section class="page-hero" style="--hero:url('/assets/img/buildout.jpg')"><div class="wrap">
+<h1>Design-build mechanical for general contractors and owners</h1>
+<p>Design-build and plan and spec HVAC for new buildings, additions and tenant build-outs. We find the savings in design, before they turn into change orders.</p>
+<div class="cta-row"><a class="btn btn-gold" href="/contact?type=quote">{icon("clipboard", 20)} Send us your project</a><a class="btn btn-outline on-dark" href="/projects">{icon("building", 20)} Recent projects</a></div>
+</div></section>
+{trust_strip()}
+
+<section class="services"><div class="wrap">
+<div class="section-head center"><h2>Why general contractors bring us back</h2></div>
+{icon_cards([
+    ("clipboard", "Owner-level estimating", "Every number is priced by the owner, with 15 years in the field. You talk to the person accountable for it."),
+    ("percent", "Value engineering", "We look for savings during design, before they cost you margin."),
+    ("wrench", "Our own crews", "Sheet metal, equipment setting, piping, controls and startup are done by our own people."),
+    ("building", "A superintendent with 42 years", "Straight answers and a crew that shows up ready when the field moves."),
+    ("calendar", "Clean paperwork", "Submittals, schedules and closeout handled without chasing."),
+    ("shield", "Service after the punch list", "Our service department backs the install with warranty support and maintenance."),
+], cols=3)}
+</div></section>
+
+<section class="split"><div class="wrap split-inner">
+{img("spiral-lift.jpg", "Crew hanging spiral duct from a scissor lift", lazy=False)}
+<div>
+<h2>Projects we build</h2>
+<p>Offices and tenant build-outs, churches, retail, recreation facilities, schools, manufacturing and government buildings. Project sizes run from small build-outs to $500K+ equipment replacements and new buildings.</p>
+<p>Send bid invitations and drawings through our <a href="/contact?type=quote">quote request</a>, where you can attach plans, or email <a href="mailto:Matt@DeeplyRootedHVAC.com">Matt@DeeplyRootedHVAC.com</a>.</p>
+</div>
+</div></section>
+{projects_section(6)}
+{cta_band("Have a project out for bid?")}
+"""
+
+PROJECTS_PAGE = f"""<section class="page-hero" style="--hero:url('/assets/img/library-crane.jpg')"><div class="wrap">
+<h1>Recent projects</h1>
+<p>Rooftop unit replacements, design-build new buildings, additions and build-outs across Southeast Michigan.</p>
+{buttons(dark=True)}
+</div></section>
+<section class="video-feature"><div class="wrap video-inner">
+<div class="video-frame"><video controls preload="none" playsinline poster="/assets/video/springfield-poster.jpg" src="/assets/video/springfield-rtu-replacement.mp4" aria-label="Rooftop unit replacement job tour at a township library"></video></div>
+<div><h2>Featured: township library</h2><p>A 90-ton rooftop unit and heating and ventilating replacement, contracted direct with the owner and completed in 2026.</p></div>
+</div></section>
+{projects_section(None, "Project list", link=False)}
+{cta_band("Let's talk about your project.")}
+"""
+
+RESIDENTIAL = f"""<section class="page-hero" style="--hero:url('/assets/img/condenser.jpg')"><div class="wrap">
+<h1>Home heating and cooling you can trust.</h1>
+<p>Repairs, replacements and maintenance for homes across {AREA}. Clear options, honest advice and a clean job site.</p>
+{buttons(dark=True, kind="home")}
+{rating_badge("on-dark")}
+</div></section>
+{trust_strip()}
+
+<section class="services"><div class="wrap">
 <div class="section-head center"><h2>Residential services</h2><p>Everything your home needs to stay comfortable all year.</p></div>
-<div class="res-split">
-<div class="res-photos"><img src="/assets/img/furnace.jpg" alt="New furnace installation" loading="lazy"><img src="/assets/img/furnace-2.jpg" alt="Furnace and ductwork in a basement" loading="lazy"></div>
 {icon_cards([
     ("flame", "Heating repair", "No heat, short cycling, strange noises, ignition problems and rooms that never warm up."),
     ("snow", "Air conditioning repair", "No cooling, weak airflow, frozen coils, leaks and uneven temperatures."),
@@ -414,22 +673,22 @@ RESIDENTIAL = f"""<section class="page-hero" style="--hero:url('/assets/img/cond
     ("thermo", "Boilers and radiant heat", "Boiler repair, service and replacement."),
     ("fan", "Ductless mini splits", "Installation and repair for additions, bonus rooms, garages and zoning."),
     ("duct", "Airflow and comfort", "Hot and cold rooms, stuffy air, filters, thermostat upgrades and duct improvements."),
-])}
-</div>
+], cols=3)}
+<div class="photo-row tight">{img("furnace.jpg", "New furnace installation")}{img("furnace-2.jpg", "Furnace and ductwork in a basement")}{img("condenser.jpg", "Air conditioning condenser outside a home")}</div>
 </div></section>
 
 {values_block("What you can expect from us", "Our core values are the promise we make at your door.")}
 
 <section class="offer"><div class="wrap offer-inner">
-<img src="/assets/img/safety-vest.jpg" alt="Deeply Rooted Mechanical team member" width="1200" height="900">
+{img("safety-vest.jpg", "Deeply Rooted Mechanical team member")}
 <div>
 <h2>Rooted Assurance Program</h2>
 <p>Two tune-ups a year, priority scheduling and 10% off parts and labor. Plans start at $295 a year.</p>
 <a class="btn btn-gold" href="/rooted-assurance-program">{icon("calendar", 20)} See the plans</a>
 </div>
 </div></section>
-{reviews_block(6)}
-{cta_band("Comfortable all year, starting today.")}
+{reviews_block(["steven", "kathy", "madeline", "anthony", "laura", "corey"], "What homeowners say")}
+{cta_band("Comfortable all year, starting today.", kind="home")}
 """
 
 
@@ -444,9 +703,8 @@ def plan_cards():
 
 
 PLANS_PAGE = f"""<section class="page-hero" style="--hero:url('/assets/img/furnace.jpg')"><div class="wrap">
-<p class="hero-slogan">{SLOGAN}</p>
 <h1>Rooted Assurance Program</h1>
-<p>Our home maintenance plan. We schedule your visits so you never have to remember, and you get priority service when something goes wrong.</p>
+<p>Our home maintenance plans. We schedule your visits so you never have to remember, and you get priority service when something goes wrong.</p>
 {rating_badge("on-dark")}
 </div></section>
 
@@ -462,102 +720,127 @@ PLANS_PAGE = f"""<section class="page-hero" style="--hero:url('/assets/img/furna
     ("bolt", "Priority scheduling", "Members move to the front of the line when something goes wrong."),
     ("percent", "10% off parts and labor", "On every repair, plus reduced emergency visit premiums."),
     ("shield", "Fewer breakdowns", "Small problems get caught early, which helps your equipment last longer."),
-])}
-<p class="note center">Have a business? Ask about a commercial <a href="/contact?type=assessment">maintenance agreement</a>. It starts with a Free Equipment Assessment.</p>
+], cols=4)}
+<p class="note center">Have a business? See our <a href="/commercial-maintenance">commercial maintenance agreements</a>.</p>
 </div></section>
-{reviews_block(3)}
-{cta_band("Questions about a plan?")}
+{reviews_block(["laura", "anthony", "kathy"], "What homeowners say")}
+{cta_band("Questions about a plan?", kind="home")}
+"""
+
+OWNER_STORY = f"""<section class="owner"><div class="wrap owner-inner">
+<figure class="owner-photo"><img src="/assets/team/matt.jpg" alt="Matt Pastor, owner of Deeply Rooted Mechanical" width="400" height="400" loading="lazy"><figcaption><strong>Matt Pastor</strong><span>Owner</span></figcaption></figure>
+<div>
+<h2>A note from our owner</h2>
+<p>Construction is in my roots. It was my dad's world before it was mine. I lost him young, and I came into the trades as a fatherless young man trying to start life on my own.</p>
+<p>For fifteen years, what I found was a broken industry in need of redemption. I worked for people who belittled their crews, didn't pay their subs, paid employees the bare minimum and built their businesses on the backs of those with the least. Some of them called themselves followers of Christ, but you couldn't see it in how they treated people.</p>
+<p>Along the way, God also put people in my path who showed me what a business in construction can look like when it honors Him and cares for people. I found hope. In 2024, by His grace, God called me to start Deeply Rooted Mechanical.</p>
+<p>Jesus said that whoever has been forgiven little loves little (Luke 7:47). I have been redeemed from much, so I want to love much, and this company is how I get to do it: caring for our people and their families, treating every customer and partner with dignity, telling the truth when it costs us, and doing work that lasts. No effort, care or kindness is wasted. God sees all of it.</p>
+<p class="sign">Matt Pastor, Owner</p>
+</div>
+</div></section>
 """
 
 TRIBUTE = f"""<section class="tribute"><div class="wrap narrow">
-<h2>Honoring Bill Purcell, a life of service</h2>
+<h2>Honoring Bill Purcell</h2>
+<p class="center">Bill Purcell was part of the Deeply Rooted Mechanical family. We made this short video to honor his life and the way he served.</p>
 <div class="yt"><iframe src="https://www.youtube-nocookie.com/embed/{TRIBUTE_YOUTUBE}" title="In Memory of Bill Purcell - Deeply Rooted Mechanical" loading="lazy" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
 </div></section>
 """
 
+ABOUT_FAQ = [
+    ("What areas do you serve?", "All of Southeast Michigan, including Livingston, Oakland, Genesee and Wayne counties. Our office is in Brighton."),
+    ("What are your hours?", f"Our office is open Monday to Friday, 7:00 AM to 4:30 PM. Emergency service is available 24/7: call {PHONE} and press 1."),
+    ("Are you licensed and insured?", f"Yes. We hold Michigan Mechanical Contractor License #{LICENSE} and carry full business insurance."),
+    ("Do you offer guarantees or warranties?", "Yes. All work comes with a satisfaction guarantee, manufacturer warranties on installed equipment and a one-year workmanship guarantee."),
+    ("Do you do plumbing or electrical work?", "No. We are heating and cooling specialists. We coordinate with your plumber and electrician when a project needs them."),
+    ("What brands do you install?", "Commercially, all major brands. For homes, we primarily install AirQuest systems."),
+    ("How often should my system be serviced?", "At least once a year, and twice a year for best results: a spring cooling check and a fall heating check."),
+]
+
 ABOUT = f"""<section class="page-hero" style="--hero:url('/assets/img/safety-vest.jpg')"><div class="wrap">
-<p class="hero-slogan">{SLOGAN}</p>
 <h1>About Deeply Rooted Mechanical</h1>
-<p>We serve homes and businesses with excellent craftsmanship, faithful leadership and a commitment to treat every person with dignity.</p>
+<p>A Brighton heating and cooling contractor serving businesses and homes with excellent craftsmanship, faithful leadership and a commitment to treat every person with dignity.</p>
 </div></section>
 
-<section class="split"><div class="wrap split-inner">
-<img src="/assets/img/crew-roof.jpg" alt="Deeply Rooted Mechanical crew setting rooftop equipment" width="1200" height="900">
+{OWNER_STORY}
+
+<section class="split why"><div class="wrap split-inner">
+{img("crew-roof.jpg", "Deeply Rooted Mechanical crew setting rooftop equipment")}
 <div>
 <h2>Why we do what we do</h2>
 <p>We do our work to honor God, not ourselves. We want to reflect His character through excellent craftsmanship, faithful leadership and the way we treat people.</p>
 <p>Every person we work with, employees, customers and partners, is made in the image of God and worthy of dignity, care and respect. In an industry often marked by shortcuts and burnout, we exist to be different: to fix systems, honor people and restore what is broken.</p>
-<p class="verse-inline">"{VERSE}" <b>{VERSE_REF}</b></p>
 </div>
 </div></section>
 
-{values_block()}
+{values_block(tone="tight")}
 {TRIBUTE}
 {team_block()}
 
 <section class="faq"><div class="wrap narrow">
 <div class="section-head center"><h2>Frequently asked questions</h2></div>
-<details><summary>What areas do you serve?</summary><p>All of Southeast Michigan, including Livingston, Oakland, Genesee and Wayne counties. Our office is in Brighton.</p></details>
-<details><summary>What are your hours?</summary><p>Our office is open Monday to Friday, 7:00 AM to 4:30 PM. Emergency service is available 24/7: call {PHONE} and press 1.</p></details>
-<details><summary>Do you offer guarantees or warranties?</summary><p>Yes. All work comes with a satisfaction guarantee, manufacturer warranties on installed equipment and a one-year workmanship guarantee.</p></details>
-<details><summary>Do you do plumbing or electrical work?</summary><p>No. We are heating and cooling specialists. We coordinate with your plumber and electrician when a project needs them.</p></details>
-<details><summary>What brands do you install?</summary><p>Commercially, all major brands. For homes, we primarily install AirQuest systems.</p></details>
-<details><summary>How often should my system be serviced?</summary><p>At least once a year, and twice a year for best results: a spring cooling check and a fall heating check.</p></details>
+{faq_html(ABOUT_FAQ)}
 </div></section>
-{reviews_block(6)}
+{reviews_block(["corey", "joe", "madeline"])}
 {cta_band()}
 """
 
 CONTACT = f"""<section class="page-hero short"><div class="wrap">
-<h1>Request service</h1>
+<h1 id="formTitle">How can we help?</h1>
 <p>Tell us what is going on and we will get back to you quickly. For no heat, no cooling or anything urgent, call <a href="tel:{TEL}">{PHONE}</a> and press 1, any hour.</p>
 </div></section>
 
 <section class="contact"><div class="wrap contact-inner">
-<form name="service-request" method="POST" action="/thanks" data-netlify="true" netlify-honeypot="company_website" class="request-form">
+<form name="service-request" method="POST" action="/thanks" enctype="multipart/form-data" data-netlify="true" netlify-honeypot="company_website" class="request-form">
 <input type="hidden" name="form-name" value="service-request">
+<input type="hidden" name="source" value="Website">
 <p class="hp"><label>Leave this empty <input name="company_website"></label></p>
 
 <fieldset><legend>What do you need?</legend>
 <div class="choices">
 <label class="choice"><input type="radio" name="request_type" value="Service call" required><span>{icon("wrench", 22)} Service call<small>Something isn't working</small></span></label>
-<label class="choice"><input type="radio" name="request_type" value="Free Equipment Assessment"><span>{icon("calendar", 22)} Free Equipment Assessment<small>Commercial buildings</small></span></label>
-<label class="choice"><input type="radio" name="request_type" value="Quote"><span>{icon("clipboard", 22)} Quote<small>New system, replacement or project</small></span></label>
+<label class="choice"><input type="radio" name="request_type" value="Free Equipment Assessment"><span>{icon("calendar", 22)} Free Equipment Assessment<small>For commercial buildings</small></span></label>
+<label class="choice"><input type="radio" name="request_type" value="Quote"><span>{icon("clipboard", 22)} Quote or bid<small>New system, replacement or project</small></span></label>
 <label class="choice"><input type="radio" name="request_type" value="Maintenance / tune-up"><span>{icon("check", 22)} Maintenance<small>Tune-up or maintenance plan</small></span></label>
 </div>
 </fieldset>
 
-<div class="grid2">
-<fieldset><legend>Property type</legend>
-<label class="pill"><input type="radio" name="property_type" value="Commercial" required> Commercial</label>
-<label class="pill"><input type="radio" name="property_type" value="Residential"> Residential</label>
+<fieldset><legend>Type of property</legend>
+<label class="pill"><input type="radio" name="property_type" value="Commercial" required> Business</label>
+<label class="pill"><input type="radio" name="property_type" value="Residential"> Home</label>
 </fieldset>
-<fieldset><legend>Is this an emergency?</legend>
-<label class="pill"><input type="radio" name="emergency" value="Yes" required> Yes</label>
-<label class="pill"><input type="radio" name="emergency" value="No"> No</label>
-</fieldset>
-</div>
-<p class="small emergency-note">For an emergency, please also call {PHONE} and press 1.</p>
 
-<label>Please describe the issue or project<textarea name="description" rows="5" required></textarea></label>
+<label>What's going on?<textarea name="description" rows="4" required placeholder="For example: rooftop unit 2 is blowing warm air"></textarea></label>
 
 <div class="grid2">
 <label>First name<input name="first_name" autocomplete="given-name" required></label>
 <label>Last name<input name="last_name" autocomplete="family-name" required></label>
-<label>Company (if commercial)<input name="company" autocomplete="organization"></label>
 <label>Phone<input name="phone" type="tel" autocomplete="tel" required></label>
-<label>Email<input name="email" type="email" autocomplete="email" required></label>
-<label>Preferred contact method
-<select name="preferred_contact"><option>Phone call</option><option>Text</option><option>Email</option></select></label>
+<label>Email <span class="opt">(optional)</span><input name="email" type="email" autocomplete="email"></label>
+<label class="span2 for-commercial">Company <span class="opt">(optional)</span><input name="company" autocomplete="organization"></label>
 <label class="span2">Street address<input name="street" autocomplete="street-address" required></label>
 <label>City<input name="city" autocomplete="address-level2" required></label>
 <label>ZIP code<input name="zip" autocomplete="postal-code" inputmode="numeric" required></label>
 </div>
 
+<div class="grid3">
+<label>How soon? <span class="opt">(optional)</span><select name="urgency"><option value="">Choose</option><option>Emergency: no heat or no cooling</option><option>In the next few days</option><option>Flexible</option></select></label>
+<label>Preferred day <span class="opt">(optional)</span><select name="preferred_day"><option value="">Any day</option><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option></select></label>
+<label>Preferred time <span class="opt">(optional)</span><select name="preferred_time"><option value="">Any time</option><option>Morning (7 to 11)</option><option>Midday (11 to 2)</option><option>Afternoon (2 to 4:30)</option></select></label>
+</div>
+
+<label class="for-plans">Drawings or photos <span class="opt">(optional, PDF or image, up to 8 MB)</span><input type="file" name="attachment" accept=".pdf,image/*"></label>
+
+<label>Best way to reach you
+<select name="preferred_contact"><option>Phone call</option><option>Text</option><option>Email</option></select></label>
+
+<div class="sms"><p class="sms-h">Text message updates (optional)</p>
 <label class="consent"><input type="checkbox" name="sms_consent_service" value="Yes"> I consent to receive non-marketing text messages from Deeply Rooted Mechanical LLC d/b/a Deeply Rooted HVAC about appointments, service updates, estimates, and customer support. Message frequency may vary. Message &amp; data rates may apply. Reply HELP for help. Reply STOP to opt out.</label>
 <label class="consent"><input type="checkbox" name="sms_consent_marketing" value="Yes"> I consent to receive marketing text messages from Deeply Rooted Mechanical LLC d/b/a Deeply Rooted HVAC about special offers, discounts, and new product updates. Message frequency may vary. Message &amp; data rates may apply. Reply HELP for help or STOP to opt out.</label>
-<p class="small">Texting is optional and not required to request service. See our <a href="/privacy-policy">Privacy Policy</a> and <a href="/terms-of-service">Terms of Service</a>.</p>
-<button class="btn btn-gold btn-lg" type="submit">{icon("arrow", 20)} Submit request</button>
+<p class="small">Texting is optional and not required to request service.</p>
+</div>
+<p class="small">See our <a href="/privacy-policy">Privacy Policy</a> and <a href="/terms-of-service">Terms of Service</a>.</p>
+<button class="btn btn-gold btn-lg" type="submit">{icon("arrow", 20)} Send request</button>
 </form>
 
 <aside class="contact-card">
@@ -631,31 +914,45 @@ NOTFOUND = f"""<section class="page-hero short"><div class="wrap">
 </div></section>
 """
 
+
+P = "Deeply Rooted Mechanical"
 PAGES = [
     ("/", "index.html", "Commercial HVAC Contractor in Brighton, MI | Deeply Rooted Mechanical",
-     "Commercial and residential heating and cooling across Southeast Michigan: rooftop unit repair and replacement, maintenance agreements, design-build, ductwork and 24/7 emergency service. 5.0 stars on Google. Call (810) 360-9664.", HOME),
-    ("/Commercial", "Commercial/index.html", "Commercial HVAC Services, Rooftop Units and Maintenance | Deeply Rooted Mechanical",
-     "Commercial HVAC for building owners, property managers and general contractors in Southeast Michigan: RTU repair and replacement, maintenance agreements, design-build, ductwork, boilers. Free Equipment Assessment.", COMMERCIAL),
-    ("/Residential", "Residential/index.html", "Furnace, AC and Boiler Service for Homes | Deeply Rooted Mechanical",
-     "Home heating and cooling repair, replacement and maintenance across Southeast Michigan. Honest options, clean work, 24/7 emergency service. Call (810) 360-9664.", RESIDENTIAL),
-    ("/rooted-assurance-program", "rooted-assurance-program/index.html", "Rooted Assurance Program | Home HVAC Maintenance Plans",
-     "Two tune-ups a year, priority scheduling and 10% off parts and labor. Furnace and AC $495, mini split $295, boiler $595 per year.", PLANS_PAGE),
-    ("/about-us", "about-us/index.html", "About Us | Deeply Rooted Mechanical, Brighton, MI",
-     "A faith-driven heating and cooling contractor serving homes and businesses across Southeast Michigan. Our core values and our team.", ABOUT),
-    ("/contact", "contact/index.html", "Request Service | Deeply Rooted Mechanical",
-     "Request HVAC service, a Free Equipment Assessment or a quote. 24/7 emergency service: call (810) 360-9664 and press 1.", CONTACT),
-    ("/thanks", "thanks/index.html", "Thank You | Deeply Rooted Mechanical", "Your request was received.", THANKS),
-    ("/privacy-policy", "privacy-policy/index.html", "Privacy Policy | Deeply Rooted Mechanical", "Privacy policy for deeplyrootedhvac.com and text messaging.", PRIVACY),
-    ("/terms-of-service", "terms-of-service/index.html", "Terms of Service | Deeply Rooted Mechanical", "Terms of service for deeplyrootedhvac.com and text messaging.", TERMS),
-    ("/404", "404.html", "Page Not Found | Deeply Rooted Mechanical", "Page not found.", NOTFOUND),
+     "Commercial and residential heating and cooling across Southeast Michigan: rooftop unit repair and replacement, maintenance agreements, design-build, ductwork and 24/7 emergency service. 5.0 stars on Google. Call (810) 360-9664.", HOME, []),
+    ("/commercial", "commercial/index.html", f"Commercial HVAC Services in Southeast Michigan | {P}",
+     "Commercial HVAC for building owners, property managers and general contractors in Southeast Michigan: RTU repair and replacement, maintenance agreements, design-build, ductwork, boilers. Free Equipment Assessment.", COMMERCIAL, []),
+    ("/rtu-replacement", "rtu-replacement/index.html", f"Rooftop Unit (RTU) Repair and Replacement, Southeast Michigan | {P}",
+     "Commercial rooftop unit repair and replacement: crane lifts, curbs, setting and startup. Licensed and insured, 5.0 stars on Google. Brighton, Novi, Livonia, Howell and all of Southeast Michigan.", RTU,
+     [service_schema("Rooftop unit replacement", "Commercial rooftop unit repair and replacement including crane lifts, curb adapters, setting and startup.", "/rtu-replacement"), faq_schema(RTU_FAQ)]),
+    ("/commercial-maintenance", "commercial-maintenance/index.html", f"Commercial HVAC Maintenance Agreements | {P}",
+     "Twice-a-year or quarterly HVAC maintenance for commercial buildings: filters included, priority scheduling, 10% off repairs and a written report after every visit. Starts with a Free Equipment Assessment.", COMM_PM,
+     [service_schema("Commercial HVAC maintenance agreement", "Scheduled commercial HVAC maintenance with filters, priority service, repair discounts and written reports.", "/commercial-maintenance"), faq_schema(PM_FAQ)]),
+    ("/design-build", "design-build/index.html", f"Design-Build HVAC for General Contractors | {P}",
+     "Design-build and plan and spec mechanical for general contractors and owners in Southeast Michigan: value engineering, owner-level estimating, our own sheet metal crews.", DESIGN_BUILD,
+     [service_schema("Design-build HVAC", "Design-build and plan and spec commercial HVAC for new buildings, additions and tenant build-outs.", "/design-build")]),
+    ("/projects", "projects/index.html", f"Recent Commercial HVAC Projects | {P}",
+     "Recent rooftop unit replacements, design-build new buildings, additions and build-outs by Deeply Rooted Mechanical across Southeast Michigan.", PROJECTS_PAGE, []),
+    ("/residential", "residential/index.html", f"Furnace, AC and Boiler Service for Homes | {P}",
+     "Home heating and cooling repair, replacement and maintenance across Southeast Michigan. Honest options, clean work, 24/7 emergency service. Call (810) 360-9664.", RESIDENTIAL, []),
+    ("/rooted-assurance-program", "rooted-assurance-program/index.html", f"Rooted Assurance Home HVAC Maintenance Plans | {P}",
+     "Two tune-ups a year, priority scheduling and 10% off parts and labor. Furnace and AC $495, mini split $295, boiler $595 per year.", PLANS_PAGE, []),
+    ("/about-us", "about-us/index.html", f"About Us | {P}, Brighton, MI",
+     "A faith-driven heating and cooling contractor in Brighton serving businesses and homes across Southeast Michigan. Our owner's story, core values and team.", ABOUT, [faq_schema(ABOUT_FAQ)]),
+    ("/contact", "contact/index.html", f"Request Service, an Assessment or a Quote | {P}",
+     "Request HVAC service, a Free Equipment Assessment or a quote. 24/7 emergency service: call (810) 360-9664 and press 1.", CONTACT, []),
+    ("/thanks", "thanks/index.html", f"Thank You | {P}", "Your request was received.", THANKS, []),
+    ("/privacy-policy", "privacy-policy/index.html", f"Privacy Policy | {P}", "Privacy policy for deeplyrootedhvac.com and text messaging.", PRIVACY, []),
+    ("/terms-of-service", "terms-of-service/index.html", f"Terms of Service | {P}", "Terms of service for deeplyrootedhvac.com and text messaging.", TERMS, []),
+    ("/404", "404.html", f"Page Not Found | {P}", "Page not found.", NOTFOUND, []),
 ]
 
 REDIRECTS = """# Old addresses from the previous site keep their rankings
 /home                                  /                           301
-/commercial                            /Commercial                 301
-/residential                           /Residential                301
+/Commercial                            /commercial                 301
+/Residential                           /residential                301
 /about                                 /about-us                   301
 /membership                            /rooted-assurance-program   301
+/maintenance                           /commercial-maintenance     301
 /deeplyrootedhvac.com/privacy-policy   /privacy-policy             301
 /deeplyrootedhvac.com/terms-of-service /terms-of-service           301
 """
@@ -666,16 +963,16 @@ def build():
         shutil.rmtree(OUT)
     os.makedirs(OUT)
     shutil.copytree(os.path.join(ROOT, "assets"), os.path.join(OUT, "assets"))
-    for path, fname, title, desc, body in PAGES:
+    for path, fname, title, desc, body, extra in PAGES:
         dest = os.path.join(OUT, fname)
         os.makedirs(os.path.dirname(dest), exist_ok=True)
         with open(dest, "w", encoding="utf-8") as f:
-            f.write(page(path, title, desc, body))
+            f.write(page(path, title, desc, body, extra))
     with open(os.path.join(OUT, "_redirects"), "w") as f:
         f.write(REDIRECTS)
     with open(os.path.join(OUT, "robots.txt"), "w") as f:
         f.write(f"User-agent: *\nAllow: /\nDisallow: /thanks\n\nSitemap: {SITE}/sitemap.xml\n")
-    urls = "".join(f"<url><loc>{SITE}{p}</loc></url>" for p, fn, *_ in PAGES if p not in ("/thanks", "/404"))
+    urls = "".join(f"<url><loc>{SITE}{p}</loc></url>" for p, *_ in PAGES if p not in ("/thanks", "/404"))
     with open(os.path.join(OUT, "sitemap.xml"), "w") as f:
         f.write(f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>\n')
     print("built", len(PAGES), "pages into", OUT)

@@ -1,8 +1,9 @@
 # Old addresses from the previous site keep their rankings
 /home                                  /                           301
-/commercial                            /Commercial                 301
-/residential                           /Residential                301
+/Commercial                            /commercial                 301
+/Residential                           /residential                301
 /about                                 /about-us                   301
 /membership                            /rooted-assurance-program   301
+/maintenance                           /commercial-maintenance     301
 /deeplyrootedhvac.com/privacy-policy   /privacy-policy             301
 /deeplyrootedhvac.com/terms-of-service /terms-of-service           301
