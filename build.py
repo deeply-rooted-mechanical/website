@@ -169,7 +169,7 @@ def schema():
         "knowsAbout": ["Commercial HVAC", "Rooftop unit (RTU) replacement", "Commercial HVAC maintenance agreements",
                        "Design-build HVAC", "Tenant build-out HVAC", "Sheet metal ductwork", "Boiler service",
                        "Ductless mini split systems", "Furnace repair", "Air conditioning repair"],
-        "slogan": SLOGAN, "sameAs": [FACEBOOK, LINKEDIN, GOOGLE_PROFILE],
+        "hasMap": GOOGLE_PROFILE, "slogan": SLOGAN, "sameAs": [FACEBOOK, LINKEDIN, GOOGLE_PROFILE],
     }
 
 
@@ -219,7 +219,7 @@ def header(path):
             items.append(f'<a href="{h}"{cur}>{t}</a>')
     return f"""<a class="skip" href="#main">Skip to content</a>
 <div class="topbar"><div class="wrap">
-<span class="slogan-mini">{SLOGAN}</span>
+<span class="slogan-mini">Licensed and insured &middot; Serving all of Southeast Michigan</span>
 <a href="tel:{TEL}">{icon("phone", 16)} {PHONE} &middot; Emergency service 24/7</a>
 </div></div>
 <header class="site"><div class="wrap">
@@ -281,9 +281,13 @@ def img(name, alt, cls="", lazy=True):
 
 def buttons(dark=True, kind="all"):
     """The calls to action, always in Matt's order: service, assessment, quote."""
-    sec = "btn-white" if dark else "btn-navy"
+    pri = "btn-white" if dark else "btn-navy"
+    sec = "btn-steel" if dark else "btn-charcoal"
     out = ['<div class="cta-row">',
-           f'<a class="btn btn-gold" href="/contact?type=service">{icon("wrench", 20)} Request Service</a>']
+           f'<a class="btn {pri}" href="/contact?type=service">{icon("wrench", 20)} Request Service</a>']
+    if kind == "gc":     # general contractors: quote first
+        return (f'<div class="cta-row"><a class="btn {pri}" href="/contact?type=quote">{icon("clipboard", 20)} Send us your project</a>'
+                f'<a class="btn btn-outline{" on-dark" if dark else ""}" href="/projects">{icon("building", 20)} Recent projects</a></div>')
     if kind == "home":   # residential pages: no commercial assessment
         out.append(f'<a class="btn {sec}" href="/contact?type=quote">{icon("clipboard", 20)} Request a Quote</a>')
         out.append(f'<a class="btn btn-outline{" on-dark" if dark else ""}" href="/rooted-assurance-program">{icon("calendar", 20)} Maintenance Plans</a>')
@@ -328,7 +332,7 @@ def reviews_block(keys, title=None):
 <div class="score"><span class="score-num"><span data-g="rating">{GOOGLE_RATING}</span></span><span class="stars">{STARS}</span><span><span data-g="count">{GOOGLE_COUNT}</span> Google reviews</span></div>
 </div>
 <div class="review-grid n{len(keys)}">{cards}</div>
-<div class="center btn-pair"><a class="btn btn-navy" href="{GOOGLE_PROFILE}" rel="noopener">Read all <span data-g="count">{GOOGLE_COUNT}</span> reviews on Google</a>
+<div class="center btn-pair"><a class="btn btn-navy" href="{GOOGLE_PROFILE}" rel="noopener"><span>Read all <span data-g="count">{GOOGLE_COUNT}</span> reviews on Google</span></a>
 <a class="btn btn-outline" href="{GOOGLE_REVIEW}" rel="noopener">Leave us a review</a></div>
 </div></section>
 """
@@ -454,7 +458,7 @@ HOME = f"""<section class="hero" style="--hero:url('/assets/img/rtu-crane.jpg')"
 <div>
 <h2>Free Equipment Assessment</h2>
 <p>For commercial buildings. We walk your rooftop units and mechanical equipment and give you a written condition report for every unit: what is good, what to watch, and what to budget for. No cost and no obligation.</p>
-<a class="btn btn-gold" href="/contact?type=assessment">{icon("calendar", 20)} Book your free assessment</a>
+<a class="btn btn-white" href="/contact?type=assessment">{icon("calendar", 20)} Book your free assessment</a>
 </div>
 </div></section>
 
@@ -502,7 +506,7 @@ COMMERCIAL = f"""<section class="page-hero" style="--hero:url('/assets/img/rooft
 <div>
 <h2>Free Equipment Assessment</h2>
 <p>We walk your rooftop units and give you a written condition report for each one, with repair recommendations and a replacement budget. It is the easiest way to plan next year's HVAC spending and to see what a maintenance agreement would cost.</p>
-<a class="btn btn-gold" href="/contact?type=assessment">{icon("calendar", 20)} Book your free assessment</a>
+<a class="btn btn-white" href="/contact?type=assessment">{icon("calendar", 20)} Book your free assessment</a>
 </div>
 </div></section>
 {reviews_block(["joe", "andrew"], "What commercial customers say")}
@@ -550,7 +554,7 @@ RTU = f"""<section class="page-hero" style="--hero:url('/assets/img/library-cran
 ])}
 </div></section>
 
-<section class="photo-row"><div class="wrap">
+<section class="photo-row"><div class="section-head center"><h2>On the job</h2></div><div class="wrap">
 {img("library-crane.jpg", "Crane lifting rooftop units at a township library")}
 {img("rtu-delivery.jpg", "New rooftop unit on a flatbed ready for the lift")}
 {img("rtu-set.jpg", "Crew setting a rooftop unit on its curb")}
@@ -599,7 +603,7 @@ COMM_PM = f"""<section class="page-hero" style="--hero:url('/assets/img/service-
     ("Your maintenance proposal", "Equipment covered, visit schedule, what is included and one yearly price."),
     ("Visits and reports", "We show up on schedule and send a report after every visit."),
 ])}
-<a class="btn btn-gold" href="/contact?type=assessment">{icon("calendar", 20)} Book your free assessment</a>
+<a class="btn btn-navy" href="/contact?type=assessment">{icon("calendar", 20)} Book your free assessment</a>
 </div>
 </div></section>
 
@@ -615,7 +619,7 @@ COMM_PM = f"""<section class="page-hero" style="--hero:url('/assets/img/service-
 DESIGN_BUILD = f"""<section class="page-hero" style="--hero:url('/assets/img/buildout.jpg')"><div class="wrap">
 <h1>Design-build mechanical for general contractors and owners</h1>
 <p>Design-build and plan and spec HVAC for new buildings, additions and tenant build-outs. We find the savings in design, before they turn into change orders.</p>
-<div class="cta-row"><a class="btn btn-gold" href="/contact?type=quote">{icon("clipboard", 20)} Send us your project</a><a class="btn btn-outline on-dark" href="/projects">{icon("building", 20)} Recent projects</a></div>
+<div class="cta-row"><a class="btn btn-white" href="/contact?type=quote">{icon("clipboard", 20)} Send us your project</a><a class="btn btn-outline on-dark" href="/projects">{icon("building", 20)} Recent projects</a></div>
 </div></section>
 {trust_strip()}
 
@@ -640,7 +644,7 @@ DESIGN_BUILD = f"""<section class="page-hero" style="--hero:url('/assets/img/bui
 </div>
 </div></section>
 {projects_section(6)}
-{cta_band("Have a project out for bid?")}
+{cta_band("Have a project out for bid?", kind="gc")}
 """
 
 PROJECTS_PAGE = f"""<section class="page-hero" style="--hero:url('/assets/img/library-crane.jpg')"><div class="wrap">
@@ -656,7 +660,7 @@ PROJECTS_PAGE = f"""<section class="page-hero" style="--hero:url('/assets/img/li
 {cta_band("Let's talk about your project.")}
 """
 
-RESIDENTIAL = f"""<section class="page-hero" style="--hero:url('/assets/img/condenser.jpg')"><div class="wrap">
+RESIDENTIAL = f"""<section class="page-hero dim" style="--hero:url('/assets/img/condenser.jpg')"><div class="wrap">
 <h1>Home heating and cooling you can trust.</h1>
 <p>Repairs, replacements and maintenance for homes across {AREA}. Clear options, honest advice and a clean job site.</p>
 {buttons(dark=True, kind="home")}
@@ -684,7 +688,7 @@ RESIDENTIAL = f"""<section class="page-hero" style="--hero:url('/assets/img/cond
 <div>
 <h2>Rooted Assurance Program</h2>
 <p>Two tune-ups a year, priority scheduling and 10% off parts and labor. Plans start at $295 a year.</p>
-<a class="btn btn-gold" href="/rooted-assurance-program">{icon("calendar", 20)} See the plans</a>
+<a class="btn btn-white" href="/rooted-assurance-program">{icon("calendar", 20)} See the plans</a>
 </div>
 </div></section>
 {reviews_block(["steven", "kathy", "madeline", "anthony", "laura", "corey"], "What homeowners say")}
@@ -698,11 +702,11 @@ def plan_cards():
         lis = "".join(f"<li>{icon('check', 18)} {e(i)}</li>" for i in items)
         out.append(f'<div class="plan"><h3>{e(n)}</h3><p class="price">{p}<span> per year</span></p>'
                    f'<p class="who">{e(who)}</p><ul class="plan-list">{lis}</ul>'
-                   f'<a class="btn btn-gold" href="{url}" rel="noopener">Join the {e(n)} plan</a></div>')
+                   f'<a class="btn btn-navy" href="{url}" rel="noopener">Join the {e(n)} plan</a></div>')
     return "".join(out)
 
 
-PLANS_PAGE = f"""<section class="page-hero" style="--hero:url('/assets/img/furnace.jpg')"><div class="wrap">
+PLANS_PAGE = f"""<section class="page-hero dim" style="--hero:url('/assets/img/furnace.jpg')"><div class="wrap">
 <h1>Rooted Assurance Program</h1>
 <p>Our home maintenance plans. We schedule your visits so you never have to remember, and you get priority service when something goes wrong.</p>
 {rating_badge("on-dark")}
@@ -787,7 +791,7 @@ ABOUT = f"""<section class="page-hero" style="--hero:url('/assets/img/safety-ves
 
 CONTACT = f"""<section class="page-hero short"><div class="wrap">
 <h1 id="formTitle">How can we help?</h1>
-<p>Tell us what is going on and we will get back to you quickly. For no heat, no cooling or anything urgent, call <a href="tel:{TEL}">{PHONE}</a> and press 1, any hour.</p>
+<p id="formSub">Tell us what is going on and we will get back to you quickly. For no heat, no cooling or anything urgent, call <a href="tel:{TEL}">{PHONE}</a> and press 1, any hour.</p>
 </div></section>
 
 <section class="contact"><div class="wrap contact-inner">
@@ -810,7 +814,7 @@ CONTACT = f"""<section class="page-hero short"><div class="wrap">
 <label class="pill"><input type="radio" name="property_type" value="Residential"> Home</label>
 </fieldset>
 
-<label>What's going on?<textarea name="description" rows="4" required placeholder="For example: rooftop unit 2 is blowing warm air"></textarea></label>
+<label><span id="descLabel">What's going on?</span><textarea id="formDesc" name="description" rows="4" required placeholder="Tell us about the equipment, the problem or the project"></textarea></label>
 
 <div class="grid2">
 <label>First name<input name="first_name" autocomplete="given-name" required></label>
@@ -840,7 +844,7 @@ CONTACT = f"""<section class="page-hero short"><div class="wrap">
 <p class="small">Texting is optional and not required to request service.</p>
 </div>
 <p class="small">See our <a href="/privacy-policy">Privacy Policy</a> and <a href="/terms-of-service">Terms of Service</a>.</p>
-<button class="btn btn-gold btn-lg" type="submit">{icon("arrow", 20)} Send request</button>
+<button class="btn btn-navy btn-lg" type="submit">{icon("arrow", 20)} Send request</button>
 </form>
 
 <aside class="contact-card">
@@ -918,26 +922,26 @@ NOTFOUND = f"""<section class="page-hero short"><div class="wrap">
 P = "Deeply Rooted Mechanical"
 PAGES = [
     ("/", "index.html", "Commercial HVAC Contractor in Brighton, MI | Deeply Rooted Mechanical",
-     "Commercial and residential heating and cooling across Southeast Michigan: rooftop unit repair and replacement, maintenance agreements, design-build, ductwork and 24/7 emergency service. 5.0 stars on Google. Call (810) 360-9664.", HOME, []),
+     "Commercial HVAC across Southeast Michigan: rooftop units, maintenance agreements, design-build and 24/7 emergency service. 5.0 stars on Google.", HOME, []),
     ("/commercial", "commercial/index.html", f"Commercial HVAC Services in Southeast Michigan | {P}",
-     "Commercial HVAC for building owners, property managers and general contractors in Southeast Michigan: RTU repair and replacement, maintenance agreements, design-build, ductwork, boilers. Free Equipment Assessment.", COMMERCIAL, []),
+     "Commercial HVAC for owners, property managers and GCs in Southeast Michigan: RTU replacement, maintenance agreements, design-build and boilers.", COMMERCIAL, []),
     ("/rtu-replacement", "rtu-replacement/index.html", f"Rooftop Unit (RTU) Repair and Replacement, Southeast Michigan | {P}",
-     "Commercial rooftop unit repair and replacement: crane lifts, curbs, setting and startup. Licensed and insured, 5.0 stars on Google. Brighton, Novi, Livonia, Howell and all of Southeast Michigan.", RTU,
+     "Commercial rooftop unit repair and replacement in Southeast Michigan: crane lifts, curbs, setting and startup. Licensed, insured, 5.0 on Google.", RTU,
      [service_schema("Rooftop unit replacement", "Commercial rooftop unit repair and replacement including crane lifts, curb adapters, setting and startup.", "/rtu-replacement"), faq_schema(RTU_FAQ)]),
     ("/commercial-maintenance", "commercial-maintenance/index.html", f"Commercial HVAC Maintenance Agreements | {P}",
-     "Twice-a-year or quarterly HVAC maintenance for commercial buildings: filters included, priority scheduling, 10% off repairs and a written report after every visit. Starts with a Free Equipment Assessment.", COMM_PM,
+     "Commercial HVAC maintenance twice a year or quarterly: filters included, priority service, 10% off repairs and a written report every visit.", COMM_PM,
      [service_schema("Commercial HVAC maintenance agreement", "Scheduled commercial HVAC maintenance with filters, priority service, repair discounts and written reports.", "/commercial-maintenance"), faq_schema(PM_FAQ)]),
     ("/design-build", "design-build/index.html", f"Design-Build HVAC for General Contractors | {P}",
-     "Design-build and plan and spec mechanical for general contractors and owners in Southeast Michigan: value engineering, owner-level estimating, our own sheet metal crews.", DESIGN_BUILD,
+     "Design-build and plan and spec HVAC for general contractors and owners in Southeast Michigan, with value engineering and our own crews.", DESIGN_BUILD,
      [service_schema("Design-build HVAC", "Design-build and plan and spec commercial HVAC for new buildings, additions and tenant build-outs.", "/design-build")]),
     ("/projects", "projects/index.html", f"Recent Commercial HVAC Projects | {P}",
-     "Recent rooftop unit replacements, design-build new buildings, additions and build-outs by Deeply Rooted Mechanical across Southeast Michigan.", PROJECTS_PAGE, []),
+     "Recent rooftop unit replacements, design-build new buildings, additions and build-outs across Southeast Michigan.", PROJECTS_PAGE, []),
     ("/residential", "residential/index.html", f"Furnace, AC and Boiler Service for Homes | {P}",
-     "Home heating and cooling repair, replacement and maintenance across Southeast Michigan. Honest options, clean work, 24/7 emergency service. Call (810) 360-9664.", RESIDENTIAL, []),
+     "Home heating and cooling repair, replacement and maintenance across Southeast Michigan. Honest options, clean work, 24/7 emergency service.", RESIDENTIAL, []),
     ("/rooted-assurance-program", "rooted-assurance-program/index.html", f"Rooted Assurance Home HVAC Maintenance Plans | {P}",
      "Two tune-ups a year, priority scheduling and 10% off parts and labor. Furnace and AC $495, mini split $295, boiler $595 per year.", PLANS_PAGE, []),
     ("/about-us", "about-us/index.html", f"About Us | {P}, Brighton, MI",
-     "A faith-driven heating and cooling contractor in Brighton serving businesses and homes across Southeast Michigan. Our owner's story, core values and team.", ABOUT, [faq_schema(ABOUT_FAQ)]),
+     "A faith-driven heating and cooling contractor in Brighton serving Southeast Michigan. Our owner's story, core values and team.", ABOUT, [faq_schema(ABOUT_FAQ)]),
     ("/contact", "contact/index.html", f"Request Service, an Assessment or a Quote | {P}",
      "Request HVAC service, a Free Equipment Assessment or a quote. 24/7 emergency service: call (810) 360-9664 and press 1.", CONTACT, []),
     ("/thanks", "thanks/index.html", f"Thank You | {P}", "Your request was received.", THANKS, []),

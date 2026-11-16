@@ -330,3 +330,14 @@ footer .legal a{display:inline-block;padding:8px 0}
  .rating{flex-wrap:wrap;border-radius:14px}
  .owner-photo img{width:180px;height:180px}
 }
+
+/* round 3b: gold kept for the header button, phone bar and stars only */
+.btn-steel{background:var(--navy-l);color:#fff;border-color:rgba(255,255,255,.4)}
+.btn-steel:hover{background:#365c8c}
+.btn-charcoal{background:var(--charcoal);color:#fff}
+.btn-charcoal:hover{background:#3a414b}
+.v-name{border-bottom-color:var(--navy)}
+.value-list p{font-size:1rem}
+.page-hero.dim::before{background:linear-gradient(90deg,rgba(17,19,23,.94) 0%,rgba(20,38,61,.9) 60%,rgba(20,38,61,.75) 100%)}
+section.photo-row .section-head{margin-bottom:20px}
+@media (max-width:1020px){.hero .wrap,.page-hero .wrap{padding-bottom:72px}}
