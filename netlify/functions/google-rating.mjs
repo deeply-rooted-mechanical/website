@@ -12,7 +12,7 @@ const QUERY = "Deeply Rooted Mechanical";
 export default async (req) => {
   // One cached answer per day: send any ?query variant to the plain address so it cannot bypass the cache.
   const u = new URL(req.url);
-  if (u.search) return Response.redirect(u.origin + u.pathname, 301);
+  if (u.search) return new Response(null, { status: 301, headers: { Location: u.pathname } });
   const key = process.env.GOOGLE_PLACES_API_KEY;
   if (!key) return json({ error: "not configured" }, 503, 300);
   const placeId = process.env.GOOGLE_PLACE_ID || DEFAULT_PLACE_ID;
