@@ -32,6 +32,9 @@ document.documentElement.classList.add("js");
     f.classList.toggle("show-plans", tv === "Quote" || tv === "Free Equipment Assessment");
     f.classList.toggle("show-commercial", pv === "Commercial");
     if (title && titles[tv]) title.textContent = titles[tv];
+    var al = document.getElementById("addrLabel"), st = document.getElementById("submitText");
+    if (al) al.textContent = (tv === "Quote" || tv === "Free Equipment Assessment") ? "Project or building address" : "Service address";
+    if (st) st.textContent = tv === "Quote" ? "Send project details" : tv === "Free Equipment Assessment" ? "Book my assessment" : "Send request";
     if (copy[tv]) { if (sub) sub.textContent = copy[tv][0]; if (dl) dl.textContent = copy[tv][1]; if (desc) desc.placeholder = copy[tv][2]; }
   }
   var t = new URLSearchParams(location.search).get("type");

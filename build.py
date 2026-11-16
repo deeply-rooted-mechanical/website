@@ -128,6 +128,19 @@ PROJECTS = [
     ("retail-rtu.jpg", "building", "Frames &amp; More", "Rooftop unit replacement: crane lift, setting and startup on an occupied retail building.", ["Rooftop units", "Retail"]),
 ]
 
+MORE_WORK = [
+    ("Agape Church", "20,000 SF new building, design-build", "In progress"),
+    ("Puckmasters Ice Rink", "11,000 SF new building, design-build", "In progress"),
+    ("Levin Courthouse", "HVAC in an occupied federal building", "2026"),
+    ("Straits Corporation", "Rooftop unit replacements, owner direct", "2026"),
+    ("Signarama Wixom", "Building HVAC", "2026"),
+    ("Mt. Clemens Montessori Academy", "HVAC upgrades", "2026"),
+    ("Oakpointe Church Milford", "10,000 SF addition", "2025"),
+    ("Target Hartland", "Store remodel", "2025"),
+    ("Hosel Rockets", "8,000 SF remodel", "2025"),
+    ("Yudo", "4,500 SF office addition and shop renovation, design-build", "2025"),
+]
+
 CITIES = [
     ("Livingston County", ["Brighton", "Howell", "Hartland", "Pinckney", "Fowlerville"]),
     ("Oakland County", ["Novi", "Milford", "Highland", "Wixom", "Commerce", "Farmington Hills", "Troy"]),
@@ -225,9 +238,9 @@ def header(path):
 <a href="tel:{TEL}">{icon("phone", 16)} {PHONE} &middot; Emergency service 24/7</a>
 </div></div>
 <header class="site"><div class="wrap">
-<a class="brand" href="/"><img src="/assets/logo.png" alt="{NAME} logo" width="56" height="56"><span class="brand-name"><b>Deeply Rooted</b><b>Mechanical</b></span></a>
+<a class="brand" href="/"><img src="/assets/logo-sm.png" alt="{NAME} logo" width="56" height="56"><span class="brand-name"><b>Deeply Rooted</b><b>Mechanical</b></span></a>
 <nav id="mainnav" aria-label="Main">{"".join(items)}</nav>
-<a class="btn btn-gold hdr-cta" href="/contact?type=service">Request Service</a>
+<a class="btn btn-navy hdr-cta" href="/contact?type=service">Request Service</a>
 <a class="icon-btn hdr-call" href="tel:{TEL}" aria-label="Call {PHONE}">{icon("phone", 22)}</a>
 <button class="icon-btn menu-btn" type="button" aria-controls="mainnav" aria-expanded="false" aria-label="Menu">{icon("menu", 24)}</button>
 </div></header>
@@ -243,7 +256,7 @@ def footer():
 </div></section>
 <footer class="site"><div class="wrap cols">
 <div>
-<img src="/assets/logo.png" alt="" width="72" height="72">
+<img src="/assets/logo-sm.png" alt="" width="72" height="72">
 <p><strong>{NAME}</strong><br>{STREET}<br>{CITY}, {STATE} {ZIP}</p>
 <p class="small">Michigan Mechanical Contractor License #{LICENSE}<br>Licensed and insured. Established 2024.</p>
 </div>
@@ -418,7 +431,7 @@ def faq_html(faqs):
 # ---------------- pages ----------------
 HOME = f"""<section class="hero" style="--hero:url('/assets/img/rtu-crane.jpg')"><div class="wrap">
 <div class="hero-copy">
-<img class="hero-logo" src="/assets/logo.png" alt="{NAME} logo" width="132" height="132">
+<img class="hero-logo" src="/assets/logo-sm.png" alt="{NAME} logo" width="132" height="132">
 <p class="hero-slogan">{SLOGAN_HTML}</p>
 <h1>Commercial HVAC you can count on, across Southeast Michigan.</h1>
 <p>Rooftop unit repair and replacement, maintenance agreements, design-build and tenant build-outs, and 24/7 emergency service for building owners, property managers and general contractors. Homeowners too.</p>
@@ -644,6 +657,13 @@ DESIGN_BUILD = f"""<section class="page-hero" style="--hero:url('/assets/img/bui
 <h2>Projects we build</h2>
 <p>Offices and tenant build-outs, churches, retail, recreation facilities, schools, manufacturing and government buildings. Project sizes run from small build-outs to $500K+ equipment replacements and new buildings.</p>
 <p>Send bid invitations and drawings through our <a href="/contact?type=quote">quote request</a>, where you can attach plans, or email <a href="mailto:Matt@DeeplyRootedHVAC.com">Matt@DeeplyRootedHVAC.com</a>.</p>
+<ul class="checks">
+<li>{icon("check", 20)} Michigan Mechanical Contractor License #{LICENSE}</li>
+<li>{icon("check", 20)} Certificate of insurance and W-9 on request</li>
+<li>{icon("check", 20)} Bid and performance bonds available</li>
+<li>{icon("check", 20)} Prequalification packages and project references ready to send</li>
+<li>{icon("check", 20)} Written safety program and toolbox talks</li>
+</ul>
 </div>
 </div></section>
 {projects_section()}
@@ -659,7 +679,13 @@ PROJECTS_PAGE = f"""<section class="page-hero" style="--hero:url('/assets/img/li
 <div class="video-frame"><video controls preload="none" playsinline poster="/assets/video/springfield-poster.jpg" src="/assets/video/springfield-rtu-replacement.mp4" aria-label="Rooftop unit replacement job tour at Springfield Township Library"></video></div>
 <div><h2>Featured: Springfield Township Library</h2><p>A 90-ton rooftop unit and heating and ventilating replacement, contracted direct with the township and completed in 2026.</p></div>
 </div></section>
-{projects_section(None, "Featured projects", link=False)}
+{projects_section(None, "Project highlights", link=False)}
+<section class="services"><div class="wrap narrow">
+<div class="section-head center"><h2>More recent work</h2><p>A sample of the commercial projects our crews have completed or have underway.</p></div>
+<table class="work"><thead><tr><th>Project</th><th>Scope</th><th>Year</th></tr></thead><tbody>
+{"".join(f"<tr><td><b>{e(a)}</b></td><td>{e(b)}</td><td>{e(c)}</td></tr>" for a, b, c in MORE_WORK)}
+</tbody></table>
+</div></section>
 {cta_band("Let's talk about your project.")}
 """
 
@@ -826,7 +852,7 @@ CONTACT = f"""<section class="page-hero short" style="--hero:url('/assets/img/se
 <label>Phone<input name="phone" type="tel" autocomplete="tel" required></label>
 <label>Email <span class="opt">(optional)</span><input name="email" type="email" autocomplete="email"></label>
 <label class="span2 for-commercial">Company <span class="opt">(optional)</span><input name="company" autocomplete="organization"></label>
-<label class="span2">Street address<input name="street" autocomplete="street-address" required></label>
+<label class="span2"><span id="addrLabel">Service address</span><input name="street" autocomplete="street-address" required></label>
 <label>City<input name="city" autocomplete="address-level2" required></label>
 <label>ZIP code<input name="zip" autocomplete="postal-code" inputmode="numeric" required></label>
 </div>
@@ -848,7 +874,7 @@ CONTACT = f"""<section class="page-hero short" style="--hero:url('/assets/img/se
 <p class="small">Texting is optional and not required to request service.</p>
 </div>
 <p class="small">See our <a href="/privacy-policy">Privacy Policy</a> and <a href="/terms-of-service">Terms of Service</a>.</p>
-<button class="btn btn-navy btn-lg" type="submit">{icon("arrow", 20)} Send request</button>
+<button class="btn btn-navy btn-lg" type="submit">{icon("arrow", 20)} <span id="submitText">Send request</span></button>
 </form>
 
 <aside class="contact-card">
@@ -929,7 +955,8 @@ PAGES = [
     ("/", "index.html", "Commercial HVAC Contractor in Brighton, MI | Deeply Rooted Mechanical",
      "Commercial HVAC across Southeast Michigan: rooftop units, maintenance agreements, design-build and 24/7 emergency service. 5.0 stars on Google.", HOME, []),
     ("/commercial", "commercial/index.html", f"Commercial HVAC Services in Southeast Michigan | {P}",
-     "Commercial HVAC for owners, property managers and GCs in Southeast Michigan: RTU replacement, maintenance agreements, design-build and boilers.", COMMERCIAL, []),
+     "Commercial HVAC for owners, property managers and GCs in Southeast Michigan: RTU replacement, maintenance agreements, design-build and boilers.", COMMERCIAL,
+     [service_schema("Commercial HVAC service", "Commercial heating and cooling repair, replacement, maintenance and design-build.", "/commercial")]),
     ("/rtu-replacement", "rtu-replacement/index.html", f"Rooftop Unit (RTU) Repair and Replacement, Southeast Michigan | {P}",
      "Commercial rooftop unit repair and replacement in Southeast Michigan: crane lifts, curbs, setting and startup. Licensed, insured, 5.0 on Google.", RTU,
      [service_schema("Rooftop unit replacement", "Commercial rooftop unit repair and replacement including crane lifts, curb adapters, setting and startup.", "/rtu-replacement"), faq_schema(RTU_FAQ)]),
@@ -942,7 +969,8 @@ PAGES = [
     ("/projects", "projects/index.html", f"Featured Commercial HVAC Projects | {P}",
      "Recent rooftop unit replacements, design-build new buildings, additions and build-outs across Southeast Michigan.", PROJECTS_PAGE, []),
     ("/residential", "residential/index.html", f"Furnace, AC and Boiler Service for Homes | {P}",
-     "Home heating and cooling repair, replacement and maintenance across Southeast Michigan. Honest options, clean work, 24/7 emergency service.", RESIDENTIAL, []),
+     "Home heating and cooling repair, replacement and maintenance across Southeast Michigan. Honest options, clean work, 24/7 emergency service.", RESIDENTIAL,
+     [service_schema("Residential HVAC service", "Furnace, air conditioning, boiler and mini split repair, replacement and maintenance.", "/residential")]),
     ("/rooted-assurance-program", "rooted-assurance-program/index.html", f"Rooted Assurance Home HVAC Maintenance Plans | {P}",
      "Two tune-ups a year, priority scheduling and 10% off parts and labor. Furnace and AC $495, mini split $295, boiler $595 per year.", PLANS_PAGE, []),
     ("/about-us", "about-us/index.html", f"About Us | {P}, Brighton, MI",
