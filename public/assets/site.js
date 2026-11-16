@@ -13,3 +13,20 @@
     }
   }
 })();
+
+// Live Google rating + review count (Netlify function, cached daily).
+// The numbers typed into the page stay as the fallback if the lookup fails.
+(function () {
+  var els = document.querySelectorAll("[data-g]");
+  if (!els.length || !window.fetch) return;
+  fetch("/api/google-rating").then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+    if (!d || !d.count) return;
+    els.forEach(function (el) {
+      var v = el.getAttribute("data-g") === "count" ? d.count : d.rating;
+      if (v) el.textContent = v;
+    });
+    document.querySelectorAll('a[aria-label*="Google reviews"]').forEach(function (a) {
+      a.setAttribute("aria-label", "Read our " + d.count + " Google reviews");
+    });
+  }).catch(function () {});
+})();

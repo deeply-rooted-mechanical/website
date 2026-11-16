@@ -196,7 +196,7 @@ def footer():
 </div>
 <div>
 <h3>Reviews and social</h3>
-<p><a href="{GOOGLE_PROFILE}" rel="noopener">{GOOGLE_RATING} stars, {GOOGLE_COUNT} Google reviews</a><br><a href="{GOOGLE_REVIEW}" rel="noopener">Leave us a Google review</a><br><a href="{FACEBOOK}" rel="noopener">Facebook</a> &middot; <a href="{LINKEDIN}" rel="noopener">LinkedIn</a></p>
+<p><a href="{GOOGLE_PROFILE}" rel="noopener"><span data-g="rating">{GOOGLE_RATING}</span> stars, <span data-g="count">{GOOGLE_COUNT}</span> Google reviews</a><br><a href="{GOOGLE_REVIEW}" rel="noopener">Leave us a Google review</a><br><a href="{FACEBOOK}" rel="noopener">Facebook</a> &middot; <a href="{LINKEDIN}" rel="noopener">LinkedIn</a></p>
 </div>
 </div>
 <div class="wrap legal"><p>&copy; 2026 {LEGAL}. Heating and cooling for homes and businesses across {AREA}.</p>
@@ -236,7 +236,7 @@ def cta_band(text="Let us serve you!"):
 
 def rating_badge(cls=""):
     return (f'<a class="rating {cls}" href="{GOOGLE_PROFILE}" rel="noopener" aria-label="Read our {GOOGLE_COUNT} Google reviews">'
-            f'<span class="stars">{STARS}</span><span class="rating-text"><b>{GOOGLE_RATING}</b> from <b>{GOOGLE_COUNT}</b> Google reviews</span></a>')
+            f'<span class="stars">{STARS}</span><span class="rating-text"><b><span data-g="rating">{GOOGLE_RATING}</span></b> from <b><span data-g="count">{GOOGLE_COUNT}</span></b> Google reviews</span></a>')
 
 
 def reviews_block(n=6):
@@ -247,12 +247,12 @@ def reviews_block(n=6):
         for name, kind, t in REVIEWS[:n])
     return f"""<section class="reviews"><div class="wrap">
 <div class="reviews-head">
-<div><h2>5-star service, {GOOGLE_COUNT} times over</h2>
-<p>Every one of our {GOOGLE_COUNT} Google reviews is 5 stars. Here is what customers say.</p></div>
-<div class="score"><span class="score-num">{GOOGLE_RATING}</span><span class="stars">{STARS}</span><span>{GOOGLE_COUNT} Google reviews</span></div>
+<div><h2>Rated <span data-g="rating">{GOOGLE_RATING}</span> stars on <span data-g="count">{GOOGLE_COUNT}</span> Google reviews</h2>
+<p>Here is what customers say about working with us.</p></div>
+<div class="score"><span class="score-num"><span data-g="rating">{GOOGLE_RATING}</span></span><span class="stars">{STARS}</span><span><span data-g="count">{GOOGLE_COUNT}</span> Google reviews</span></div>
 </div>
 <div class="review-grid">{cards}</div>
-<div class="center"><a class="btn btn-navy" href="{GOOGLE_PROFILE}" rel="noopener">Read all {GOOGLE_COUNT} reviews on Google</a>
+<div class="center"><a class="btn btn-navy" href="{GOOGLE_PROFILE}" rel="noopener">Read all <span data-g="count">{GOOGLE_COUNT}</span> reviews on Google</a>
 <a class="btn btn-outline" href="{GOOGLE_REVIEW}" rel="noopener">Leave us a review</a></div>
 </div></section>
 """

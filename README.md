@@ -7,3 +7,8 @@ deeplyrootedhvac.com, the public website for Deeply Rooted Mechanical. Hosted on
 - Old addresses (/home, /Commercial, /Residential, /about-us, /rooted-assurance-program) are kept or redirected so rankings carry over (`_redirects`).
 - Legal pages and SMS consent wording match what the Twilio texting campaign was approved with. Do not change them without checking the campaign.
 - Plan and decisions: project doc `claude/marketing/website-rebuild-plan.md`.
+
+## Live Google rating
+`netlify/functions/google-rating.mjs` serves `/api/google-rating` (cached 24 h at Netlify's CDN, so Google is called about once a day).
+`assets/site.js` swaps the live rating and count into every `data-g` span; the numbers in `build.py` are the fallback.
+Netlify environment variables (entered by Matt only, scope Functions): `GOOGLE_PLACES_API_KEY` (required), `GOOGLE_PLACE_ID` (optional).
