@@ -9,7 +9,10 @@
 const DEFAULT_PLACE_ID = "ChIJ5U_xpC9Ke0gRKTXo0w_VzbI";
 const QUERY = "Deeply Rooted Mechanical";
 
-export default async () => {
+export default async (req) => {
+  // One cached answer per day: send any ?query variant to the plain address so it cannot bypass the cache.
+  const u = new URL(req.url);
+  if (u.search) return Response.redirect(u.origin + u.pathname, 301);
   const key = process.env.GOOGLE_PLACES_API_KEY;
   if (!key) return json({ error: "not configured" }, 503, 300);
   const placeId = process.env.GOOGLE_PLACE_ID || DEFAULT_PLACE_ID;
