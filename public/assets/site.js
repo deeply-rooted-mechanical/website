@@ -46,6 +46,14 @@ document.documentElement.classList.add("js");
       if (c) c.checked = true;
     }
   }
+  var hero = document.querySelector(".page-hero");
+  var heroImg = { "Quote": "rtu-crane.jpg", "Free Equipment Assessment": "exhaust-fan.jpg" };
+  var _sync = sync;
+  sync = function () {
+    _sync();
+    var c = f.querySelector('input[name="request_type"]:checked');
+    if (hero) hero.style.setProperty("--hero", "url('/assets/img/" + ((c && heroImg[c.value]) || "service-tech.jpg") + "')");
+  };
   f.addEventListener("change", sync);
   sync();
 })();

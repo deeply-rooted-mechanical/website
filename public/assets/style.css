@@ -371,3 +371,21 @@ section.photo-row .section-head{margin-bottom:20px}
 .work td:last-child{white-space:nowrap;color:var(--muted)}
 .split .checks{margin-top:14px}
 @media (max-width:640px){.hero-logo{display:none}.work th:nth-child(2),.work td:nth-child(2){font-size:.92rem}}
+
+/* round 6 */
+.trusted{background:#fff;padding:30px 0;border-bottom:1px solid var(--line)}
+.tb-h{text-align:center;color:var(--muted);font-size:.85rem;text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin:0 0 14px}
+.trusted ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;justify-content:center;gap:10px 26px}
+.trusted li{font-family:Georgia,"Times New Roman",serif;font-weight:700;color:var(--navy-d);font-size:1.12rem}
+.projects li > div{display:flex;flex-direction:column}
+.projects .tags{margin-top:auto!important;padding-top:8px}
+.cost-line{background:var(--gray-l);border-left:4px solid var(--navy);padding:14px 18px;border-radius:8px}
+.hero-logo{width:108px;height:108px;margin-bottom:16px}
+@media (max-width:640px){
+ .work thead{display:none}
+ .work,.work tbody,.work tr,.work td{display:block;width:100%}
+ .work tr{border-bottom:1px solid var(--line);padding:10px 14px}
+ .work td{border:0;padding:2px 0}
+ .work td:last-child{color:var(--muted);font-size:.9rem}
+ .paths{display:none}
+}

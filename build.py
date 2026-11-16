@@ -399,8 +399,10 @@ def project_cards(items):
     return '<ul class="projects">' + "".join(out) + '</ul>'
 
 
-def projects_section(n=None, head_txt="Featured projects", link=True):
+def projects_section(n=None, head_txt="Featured projects", link=True, skip_first=False):
     items = PROJECTS[:n] if n else PROJECTS
+    if skip_first:
+        items = items[1:]
     more = '<div class="center"><a class="btn btn-outline" href="/projects">See the project video and more</a></div>' if link else ""
     return f"""<section class="proj-sec"><div class="wrap">
 <div class="section-head center"><h2>{head_txt}</h2><p>A few of the commercial jobs our crews have completed across Southeast Michigan.</p></div>
@@ -413,6 +415,14 @@ def projects_section(n=None, head_txt="Featured projects", link=True):
 def steps(items):
     return '<ol class="steps">' + "".join(f'<li><span class="n">{i}</span><h3>{e(t)}</h3><p>{e(d)}</p></li>'
                                           for i, (t, d) in enumerate(items, 1)) + '</ol>'
+
+
+TRUSTED = ["Springfield Township", "Levin Courthouse", "Target", "Schafer Construction", "Woods Construction", "McKenzie Construction", "Straits Corporation", "Arbon Equipment"]
+
+
+def trusted_by():
+    items = "".join(f"<li>{e(t)}</li>" for t in TRUSTED)
+    return f'<section class="trusted"><div class="wrap"><p class="tb-h">Trusted by owners and general contractors including</p><ul>{items}</ul></div></section>'
 
 
 def where_we_work():
@@ -468,6 +478,7 @@ HOME = f"""<section class="hero" style="--hero:url('/assets/img/rtu-crane.jpg')"
 </div></section>
 
 {projects_section(3)}
+{trusted_by()}
 
 <section class="offer"><div class="wrap offer-inner">
 {img("exhaust-fan.jpg", "Technician inspecting a rooftop exhaust fan", lazy=False)}
@@ -492,6 +503,7 @@ COMMERCIAL = f"""<section class="page-hero" style="--hero:url('/assets/img/rooft
 {rating_badge("on-dark")}
 </div></section>
 {trust_strip()}
+{trusted_by()}
 
 <section class="services"><div class="wrap">
 <div class="section-head center"><h2>Commercial service capabilities</h2><p>One mechanical partner for service, maintenance and construction.</p></div>
@@ -625,6 +637,7 @@ COMM_PM = f"""<section class="page-hero" style="--hero:url('/assets/img/service-
 
 <section class="faq"><div class="wrap narrow">
 <div class="section-head center"><h2>Maintenance agreement questions</h2></div>
+<p class="cost-line"><b>What it costs:</b> priced by the equipment you have and how often we visit. Your Free Equipment Assessment comes with a written maintenance proposal and one yearly price, so you know the cost before you sign anything.</p>
 {faq_html(PM_FAQ)}
 <p class="note center">Looking for a plan for your home? See our <a href="/rooted-assurance-program">Rooted Assurance home plans</a>.</p>
 </div></section>
@@ -679,7 +692,7 @@ PROJECTS_PAGE = f"""<section class="page-hero" style="--hero:url('/assets/img/li
 <div class="video-frame"><video controls preload="none" playsinline poster="/assets/video/springfield-poster.jpg" src="/assets/video/springfield-rtu-replacement.mp4" aria-label="Rooftop unit replacement job tour at Springfield Township Library"></video></div>
 <div><h2>Featured: Springfield Township Library</h2><p>A 90-ton rooftop unit and heating and ventilating replacement, contracted direct with the township and completed in 2026.</p></div>
 </div></section>
-{projects_section(None, "Project highlights", link=False)}
+{projects_section(None, "More project highlights", link=False, skip_first=True)}
 <section class="services"><div class="wrap narrow">
 <div class="section-head center"><h2>More recent work</h2><p>A sample of the commercial projects our crews have completed or have underway.</p></div>
 <table class="work"><thead><tr><th>Project</th><th>Scope</th><th>Year</th></tr></thead><tbody>
