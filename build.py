@@ -5,7 +5,7 @@ Edit content below, run `python3 build.py`, commit build.py + public/.
 Netlify publishes public/ as-is on every push to main (no build step on Netlify).
 This repo is PUBLIC: never put keys, passwords or business notes in it.
 """
-import json, os, shutil, html
+import json, os, shutil, html, hashlib
 from PIL import Image
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -34,6 +34,12 @@ VERSE_REF = "Colossians 2:7"
 TRIBUTE_YOUTUBE = "7POdWOwnGcc"
 
 e = html.escape
+
+
+def ver(name):
+    """Short content hash so browsers fetch new CSS/JS the moment it changes."""
+    with open(os.path.join(ROOT, "assets", name), "rb") as f:
+        return hashlib.md5(f.read()).hexdigest()[:8]
 
 # ---------- icons (simple line icons, currentColor) ----------
 def icon(name, size=28):
@@ -201,7 +207,7 @@ def head(title, desc, path, extra):
 <meta property="og:image" content="{SITE}/assets/img/rtu-crane.jpg">
 <meta name="theme-color" content="#14263d">
 <link rel="icon" type="image/png" href="/assets/favicon.png">
-<link rel="stylesheet" href="/assets/style.css">
+<link rel="stylesheet" href="/assets/style.css?v={ver('style.css')}">
 {blocks}
 </head>
 <body>
@@ -263,7 +269,7 @@ def footer():
 <p><a href="/privacy-policy">Privacy Policy</a> &middot; <a href="/terms-of-service">Terms of Service</a></p></div>
 </footer>
 <div class="mbar"><a href="tel:{TEL}">{icon("phone", 20)} Call</a><a class="mbar-main" href="/contact?type=service">{icon("wrench", 20)} Request Service</a></div>
-<script src="/assets/site.js" defer></script>
+<script src="/assets/site.js?v={ver('site.js')}" defer></script>
 </body>
 </html>
 """
