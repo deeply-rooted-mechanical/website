@@ -189,7 +189,7 @@ def schema():
 
 def service_schema(name, desc, path):
     return {"@context": "https://schema.org", "@type": "Service", "name": name, "description": desc,
-            "serviceType": name, "url": SITE + path, "provider": {"@id": SITE + "/#business"},
+            "serviceType": name, "url": SITE + slash(path), "provider": {"@id": SITE + "/#business"},
             "areaServed": {"@type": "AdministrativeArea", "name": "Southeast Michigan"}}
 
 
@@ -207,11 +207,11 @@ def head(title, desc, path, extra):
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{e(title)}</title>
 <meta name="description" content="{e(desc)}">
-<link rel="canonical" href="{SITE}{path}">
+<link rel="canonical" href="{SITE}{slash(path)}">
 <meta property="og:type" content="website">
 <meta property="og:title" content="{e(title)}">
 <meta property="og:description" content="{e(desc)}">
-<meta property="og:url" content="{SITE}{path}">
+<meta property="og:url" content="{SITE}{slash(path)}">
 <meta property="og:image" content="{SITE}/assets/img/rtu-crane.jpg">
 <meta name="theme-color" content="#14263d">
 <link rel="icon" type="image/png" href="/assets/favicon.png">
@@ -280,6 +280,12 @@ def footer():
 </body>
 </html>
 """
+
+
+def slash(p):
+    """Pages are folders (commercial/index.html), so Netlify serves them at /commercial/ and 301s /commercial there.
+    Canonical tags, the sitemap, schema and internal links use the final address so Google never sees a redirect."""
+    return p if p == "/" or p.endswith("/") else p + "/"
 
 
 def page(path, title, desc, body, extra=()):
@@ -1011,13 +1017,13 @@ PAGES = [
 
 REDIRECTS = """# Old addresses from the previous site keep their rankings
 /home                                  /                           301
-/Commercial                            /commercial                 301
-/Residential                           /residential                301
-/about                                 /about-us                   301
-/membership                            /rooted-assurance-program   301
-/maintenance                           /commercial-maintenance     301
-/deeplyrootedhvac.com/privacy-policy   /privacy-policy             301
-/deeplyrootedhvac.com/terms-of-service /terms-of-service           301
+/Commercial                            /commercial/                 301
+/Residential                           /residential/                301
+/about                                 /about-us/                   301
+/membership                            /rooted-assurance-program/   301
+/maintenance                           /commercial-maintenance/     301
+/deeplyrootedhvac.com/privacy-policy   /privacy-policy/             301
+/deeplyrootedhvac.com/terms-of-service /terms-of-service/           301
 """
 
 
@@ -1026,16 +1032,19 @@ def build():
         shutil.rmtree(OUT)
     os.makedirs(OUT)
     shutil.copytree(os.path.join(ROOT, "assets"), os.path.join(OUT, "assets"))
+    PAGE_PATHS = {p for p, *_ in PAGES if p != "/"}
     for path, fname, title, desc, body, extra in PAGES:
         dest = os.path.join(OUT, fname)
         os.makedirs(os.path.dirname(dest), exist_ok=True)
         with open(dest, "w", encoding="utf-8") as f:
-            f.write(page(path, title, desc, body, extra))
+            doc = page(path, title, desc, body, extra)
+            doc = re.sub(r'href="(/[a-z0-9-]+)([?#][^"]*)?"', lambda m: f'href="{slash(m.group(1)) if m.group(1) in PAGE_PATHS else m.group(1)}{m.group(2) or ""}"', doc)
+            f.write(doc)
     with open(os.path.join(OUT, "_redirects"), "w") as f:
         f.write(REDIRECTS)
     with open(os.path.join(OUT, "robots.txt"), "w") as f:
         f.write(f"User-agent: *\nAllow: /\nDisallow: /thanks\n\nSitemap: {SITE}/sitemap.xml\n")
-    urls = "".join(f"<url><loc>{SITE}{p}</loc></url>" for p, *_ in PAGES if p not in ("/thanks", "/404"))
+    urls = "".join(f"<url><loc>{SITE}{slash(p)}</loc></url>" for p, *_ in PAGES if p not in ("/thanks", "/404"))
     with open(os.path.join(OUT, "sitemap.xml"), "w") as f:
         f.write(f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>\n')
     print("built", len(PAGES), "pages into", OUT)
