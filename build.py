@@ -417,8 +417,7 @@ def steps(items):
 
 
 # Client logos (Matt 11/16: "All logos now"). Levin Courthouse is text only: federal seals/logos can't be used to imply endorsement.
-TRUSTED = [("target", "Target"), ("marriott", "Troy Marriott"), ("dac", "Detroit Athletic Club"), (None, "Levin U.S. Courthouse"),
-           ("springfield", "Springfield Township"), ("schafer", "Schafer Construction"), ("woods", "Woods Construction"),
+TRUSTED = [("target", "Target"), ("marriott", "Troy Marriott"), ("dac", "Detroit Athletic Club"), ("springfield", "Springfield Township"), ("schafer", "Schafer Construction"), ("woods", "Woods Construction"),
            ("mckenzie", "McKenzie Construction")]
 
 
@@ -447,7 +446,7 @@ HOME = f"""<section class="hero" style="--hero:url('/assets/img/rtu-crane.jpg')"
 <div class="hero-copy">
 <p class="hero-slogan">{SLOGAN_HTML}</p>
 <h1>Commercial HVAC you can count on, across Southeast Michigan.</h1>
-<p>Rooftop unit repair and replacement, maintenance agreements, design-build and tenant build-outs, and 24/7 emergency service for building owners, property managers and general contractors. Homeowners too.</p>
+<p>Rooftop units, maintenance agreements, design-build, tenant build-outs and 24/7 emergency service for building owners, property managers and general contractors. We serve homeowners across the region as well.</p>
 {buttons(dark=True)}
 {rating_badge("on-dark")}
 </div>
@@ -780,10 +779,10 @@ OWNER_STORY = f"""<section class="owner"><div class="wrap owner-inner">
 <figure class="owner-photo"><img src="/assets/team/matt.jpg" alt="Matt Pastor, owner of Deeply Rooted Mechanical" width="400" height="400" loading="lazy"><figcaption><strong>Matt Pastor</strong><span>Owner</span></figcaption></figure>
 <div>
 <h2>A note from our owner</h2>
-<p>Construction is in my roots. It was my dad's world before it was mine. I lost him young, and I came into the trades as a fatherless young man trying to start life on my own.</p>
+<p>Construction is in my roots. My father brought me up in the world of construction, and I loved it. I lost him young, and I came into the trades as a fatherless young man trying to start life on my own.</p>
 <p>For fifteen years, what I found was a broken industry in need of redemption. I worked for people who belittled their crews, didn't pay their subs, paid employees the bare minimum and built their businesses on the backs of those with the least. Some of them called themselves followers of Christ, but you couldn't see it in how they treated people.</p>
 <p>Along the way, God put people in my path who showed me what a business in construction can look like when it honors Him and cares for people. I found hope. In 2024, by His grace, God called me to start Deeply Rooted Mechanical.</p>
-<p>Jesus said that whoever has been forgiven little loves little (Luke 7:47). I have been redeemed from much, so I want to love much, and this company is how I get to do it: caring for our people and their families, treating every customer and partner with dignity, telling the truth when it costs us, and doing work that lasts. No effort, care or kindness is wasted. God sees all of it.</p>
+<p>When a woman washed His feet with her tears, Jesus said, &ldquo;her many sins have been forgiven&mdash;as her great love has shown. But whoever has been forgiven little loves little&rdquo; (Luke 7:47). I have been forgiven and redeemed from much, so I want to love much, and this company is how I get to do it: caring for our people and their families, treating every customer and partner with dignity, telling the truth when it costs us, and doing work that lasts. No effort, care or kindness is wasted. God sees all of it.</p>
 <p>When I look at what the Lord has built here, I am humbled and grateful. Every crew member, every job and every open door is His provision. And to every customer and partner who has trusted us with your building, your home or your project: thank you. Your trust is a gift we never take for granted.</p>
 <p class="sign">Matt Pastor, Owner</p>
 </div>
